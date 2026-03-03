@@ -1,9 +1,22 @@
 /**
  * YouTube Overlay - Content Script
  * Disables video interactions on YouTube through CSS injection
+ * Excludes videos with badges from overlay
  */
 
 import overlayStyles from './styles/overlay.css?inline';
+
+// Configuration
+const BADGE_SELECTOR = '.yt-badge-shape__icon';
+const EXCLUSION_CLASS = 'yt-overlay-excluded';
+const VIDEO_SELECTORS = [
+  'ytd-thumbnail',
+  'ytd-video-preview',
+  'ytd-compact-video-renderer',
+  'ytd-grid-video-renderer',
+  'ytd-rich-item-renderer',
+  'ytd-reel-video-renderer',
+];
 
 /**
  * Inject overlay styles into the page
@@ -24,11 +37,102 @@ function injectOverlayStyles(): void {
     const targetElement = document.head || document.documentElement;
     targetElement.appendChild(styleElement);
 
-    console.log('[YT Overlay] Video interactions disabled');
+    console.log('[YT Overlay] Styles injected');
   } catch (error) {
-    // Silent failure - don't expose errors to user
     console.error('[YT Overlay] Failed to inject styles:', error);
   }
+}
+
+/**
+ * Check if element contains badge icon
+ */
+function hasBadge(element: Element): boolean {
+  return element.querySelector(BADGE_SELECTOR) !== null;
+}
+
+/**
+ * Process video element for badge detection
+ */
+function processVideoElement(element: Element): void {
+  if (hasBadge(element)) {
+    // Badge found - exclude from overlay
+    if (!element.classList.contains(EXCLUSION_CLASS)) {
+      element.classList.add(EXCLUSION_CLASS);
+      console.log('[YT Overlay] Badge detected, excluding:', element);
+    }
+  } else {
+    // No badge - ensure exclusion class is removed
+    if (element.classList.contains(EXCLUSION_CLASS)) {
+      element.classList.remove(EXCLUSION_CLASS);
+      console.log('[YT Overlay] Badge removed, applying overlay:', element);
+    }
+  }
+}
+
+/**
+ * Process all video elements in the document
+ */
+function processAllVideoElements(): void {
+  VIDEO_SELECTORS.forEach((selector) => {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach((element) => processVideoElement(element));
+  });
+}
+
+/**
+ * Debounce function to limit execution frequency
+ */
+function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
+/**
+ * Setup MutationObserver to watch for dynamic content
+ */
+function setupMutationObserver(): void {
+  const debouncedProcess = debounce(processAllVideoElements, 300);
+
+  const observer = new MutationObserver((mutations) => {
+    let shouldProcess = false;
+
+    for (const mutation of mutations) {
+      // Check if added nodes contain video elements
+      if (mutation.addedNodes.length > 0) {
+        shouldProcess = true;
+        break;
+      }
+
+      // Check if badge was added/removed
+      if (mutation.type === 'childList' || mutation.type === 'attributes') {
+        const target = mutation.target as Element;
+        if (target.matches && VIDEO_SELECTORS.some(sel => target.matches(sel) || target.closest(sel))) {
+          shouldProcess = true;
+          break;
+        }
+      }
+    }
+
+    if (shouldProcess) {
+      debouncedProcess();
+    }
+  });
+
+  // Observe YouTube content area
+  const targetNode = document.body;
+  observer.observe(targetNode, {
+    childList: true,
+    subtree: true,
+    attributes: false,
+  });
+
+  console.log('[YT Overlay] MutationObserver active');
 }
 
 /**
@@ -38,11 +142,18 @@ function init(): void {
   // Inject styles immediately
   injectOverlayStyles();
 
-  // Re-inject on DOM changes (for dynamic content)
-  // Using simple check instead of MutationObserver for Phase 1
+  // Process existing elements
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectOverlayStyles);
+    document.addEventListener('DOMContentLoaded', () => {
+      processAllVideoElements();
+      setupMutationObserver();
+    });
+  } else {
+    processAllVideoElements();
+    setupMutationObserver();
   }
+
+  console.log('[YT Overlay] Initialized');
 }
 
 // Run initialization

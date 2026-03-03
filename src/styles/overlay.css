@@ -1,6 +1,6 @@
 /* YouTube Overlay - Video Interaction Blocking Styles */
 
-/* Video thumbnails */
+/* Enhanced overlay - completely hide content */
 ytd-thumbnail,
 ytd-video-preview,
 ytd-compact-video-renderer,
@@ -9,8 +9,22 @@ ytd-rich-item-renderer {
   pointer-events: none !important;
   cursor: not-allowed !important;
   user-select: none !important;
-  opacity: 0.6 !important;
-  filter: grayscale(40%) !important;
+  opacity: 0.05 !important;
+  filter: blur(30px) grayscale(100%) brightness(0.5) !important;
+  transition: none !important;
+}
+
+/* Exception: Badge videos remain visible and interactive */
+ytd-thumbnail.yt-overlay-excluded,
+ytd-video-preview.yt-overlay-excluded,
+ytd-compact-video-renderer.yt-overlay-excluded,
+ytd-grid-video-renderer.yt-overlay-excluded,
+ytd-rich-item-renderer.yt-overlay-excluded {
+  opacity: 1 !important;
+  filter: none !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  user-select: auto !important;
 }
 
 /* Video player */
@@ -39,11 +53,20 @@ ytd-grid-video-renderer a {
   display: none !important;
 }
 
-/* Shorts */
+/* Shorts - enhanced overlay */
 ytd-reel-video-renderer,
 ytd-shorts {
   pointer-events: none !important;
   cursor: not-allowed !important;
-  opacity: 0.6 !important;
-  filter: grayscale(40%) !important;
+  opacity: 0.05 !important;
+  filter: blur(30px) grayscale(100%) brightness(0.5) !important;
+}
+
+/* Exception: Badge shorts remain visible */
+ytd-reel-video-renderer.yt-overlay-excluded,
+ytd-shorts.yt-overlay-excluded {
+  opacity: 1 !important;
+  filter: none !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }

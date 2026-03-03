@@ -52,7 +52,23 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - public/ - manifest.json + icons
 - bun.lockb - bunパッケージマネージャー
 
-## Phase 4: リリース準備
+## Phase 4: 高度な機能実装 ✅
+**目標**: Badge除外とオーバーレイ強化
+
+### タスク
+- [x] Badge検出ロジック実装（`.yt-badge-shape__icon`）
+- [x] MutationObserver実装（動的要素監視）
+- [x] 除外クラス適用機能（`yt-overlay-excluded`）
+- [x] オーバーレイ強化（完全非表示レベル）
+- [x] デバウンス処理でパフォーマンス最適化
+
+**成果物**:
+- Badge付き動画の自動検出と除外機能
+- 強化されたオーバーレイ（opacity 0.05, blur 30px）
+- MutationObserverによる動的コンテンツ対応
+- docs/workflow/spec/wip/003-badge-exclusion-and-enhanced-overlay.md
+
+## Phase 5: リリース準備
 **目標**: 実運用に向けた準備
 
 ### タスク
@@ -66,14 +82,18 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 
 ---
 
-**現在のフェーズ**: Phase 4（リリース準備）
+**現在のフェーズ**: Phase 5（リリース準備）
 **最終更新**: 2026-03-03
 
 ## 進捗メモ
-- Phase 1-3完了
+- Phase 1-4完了
 - 初回実装での問題点をすべて解決:
   - ✅ プロジェクト構造整理
   - ✅ dist/に必要ファイル完備（manifest.json + icons）
   - ✅ CSS可読性向上（別ファイル分離）
   - ✅ bunへの移行完了
   - ✅ Overlay命名への統一
+- Badge検出機能実装:
+  - ✅ `.yt-badge-shape__icon`を持つ動画を除外
+  - ✅ 動的コンテンツに対応（MutationObserver）
+  - ✅ オーバーレイ大幅強化（完全非表示レベル）
