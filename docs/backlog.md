@@ -1,2 +1,9 @@
-- クロームの拡張を作りたい
-- youtube.comの時、動画を押す操作を無効化して触れなくする。基本的にはcssの適用を想定
+- 直下にアプリが作成されているため、見づらい。/app以下や/src以下などにしてほしい。
+- distにはcontent.jsしかないため、エラーが出る
+    - 具体的には以下を手動で配置したら動いた
+        - manifest.json
+        - icons/icon16.png,icons/icon48.png,incos/icon128.png
+    - が必要だった。publicを用意し、それのコピー+ビルドしたjsの形に変更する
+- パッケージマネージャーをnpmではなくbunにする
+- 全体的な名称として、Blocker→Overlayにしてほしい。
+- conent.ts内にcssが書いてあるの、可読性なさすぎるため別のcssに切れないか検討
