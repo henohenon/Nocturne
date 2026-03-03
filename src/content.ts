@@ -1,20 +1,21 @@
 /**
  * YouTube Overlay - Content Script
- * Disables video interactions on YouTube through CSS injection
- * Excludes videos with badges from overlay
+ * Hides non-music content on YouTube
+ * Shows only videos with badges (music, live, mixes)
  */
 
 import overlayStyles from './styles/overlay.css?inline';
 
 // Configuration
 const BADGE_SELECTOR = '.yt-badge-shape__icon';
-const EXCLUSION_CLASS = 'yt-overlay-excluded';
+const SHOW_CLASS = 'show';
+const MUSIC_CLASS = 'music';
 const VIDEO_SELECTORS = [
-  'ytd-thumbnail',
-  'ytd-video-preview',
+  'ytd-rich-item-renderer',
   'ytd-compact-video-renderer',
   'ytd-grid-video-renderer',
-  'ytd-rich-item-renderer',
+  'ytd-video-renderer',
+  'yt-lockup-view-model',
   'ytd-reel-video-renderer',
 ];
 
@@ -23,17 +24,14 @@ const VIDEO_SELECTORS = [
  */
 function injectOverlayStyles(): void {
   try {
-    // Check if styles already injected
     if (document.getElementById('yt-overlay-styles')) {
       return;
     }
 
-    // Create and inject style element
     const styleElement = document.createElement('style');
     styleElement.id = 'yt-overlay-styles';
     styleElement.textContent = overlayStyles;
 
-    // Inject into head or html element
     const targetElement = document.head || document.documentElement;
     targetElement.appendChild(styleElement);
 
@@ -55,16 +53,16 @@ function hasBadge(element: Element): boolean {
  */
 function processVideoElement(element: Element): void {
   if (hasBadge(element)) {
-    // Badge found - exclude from overlay
-    if (!element.classList.contains(EXCLUSION_CLASS)) {
-      element.classList.add(EXCLUSION_CLASS);
-      console.log('[YT Overlay] Badge detected, excluding:', element);
+    // Badge found - show the element
+    if (!element.classList.contains(SHOW_CLASS)) {
+      element.classList.add(SHOW_CLASS);
+      console.log('[YT Overlay] Badge detected, showing:', element);
     }
   } else {
-    // No badge - ensure exclusion class is removed
-    if (element.classList.contains(EXCLUSION_CLASS)) {
-      element.classList.remove(EXCLUSION_CLASS);
-      console.log('[YT Overlay] Badge removed, applying overlay:', element);
+    // No badge - ensure show class is removed
+    if (element.classList.contains(SHOW_CLASS)) {
+      element.classList.remove(SHOW_CLASS);
+      console.log('[YT Overlay] Badge removed, hiding:', element);
     }
   }
 }
@@ -77,6 +75,46 @@ function processAllVideoElements(): void {
     const elements = document.querySelectorAll(selector);
     elements.forEach((element) => processVideoElement(element));
   });
+}
+
+/**
+ * Check if current video is music category
+ */
+function checkMusicCategory(): void {
+  try {
+    // Look for ytInitialPlayerResponse in page scripts
+    const scripts = Array.from(document.querySelectorAll('script'));
+    for (const script of scripts) {
+      const content = script.textContent || '';
+      const match = content.match(/var ytInitialPlayerResponse\s*=\s*({.+?});/);
+
+      if (match) {
+        const playerResponse = JSON.parse(match[1]);
+        const category = playerResponse?.microformat?.playerMicroformatRenderer?.category;
+
+        if (category === 'Music') {
+          document.body.classList.add(MUSIC_CLASS);
+          console.log('[YT Overlay] Music detected, enabling player');
+        } else {
+          document.body.classList.remove(MUSIC_CLASS);
+          console.log('[YT Overlay] Non-music, player disabled');
+        }
+        return;
+      }
+    }
+
+    // Fallback: check after a delay if not found immediately
+    setTimeout(checkMusicCategory, 1000);
+  } catch (error) {
+    console.error('[YT Overlay] Failed to check music category:', error);
+  }
+}
+
+/**
+ * Check if we're on a watch page
+ */
+function isWatchPage(): boolean {
+  return window.location.pathname === '/watch';
 }
 
 /**
@@ -103,13 +141,11 @@ function setupMutationObserver(): void {
     let shouldProcess = false;
 
     for (const mutation of mutations) {
-      // Check if added nodes contain video elements
       if (mutation.addedNodes.length > 0) {
         shouldProcess = true;
         break;
       }
 
-      // Check if badge was added/removed
       if (mutation.type === 'childList' || mutation.type === 'attributes') {
         const target = mutation.target as Element;
         if (target.matches && VIDEO_SELECTORS.some(sel => target.matches(sel) || target.closest(sel))) {
@@ -124,7 +160,6 @@ function setupMutationObserver(): void {
     }
   });
 
-  // Observe YouTube content area
   const targetNode = document.body;
   observer.observe(targetNode, {
     childList: true,
@@ -133,6 +168,18 @@ function setupMutationObserver(): void {
   });
 
   console.log('[YT Overlay] MutationObserver active');
+}
+
+/**
+ * Handle navigation changes (YouTube SPA)
+ */
+function handleNavigation(): void {
+  if (isWatchPage()) {
+    checkMusicCategory();
+  } else {
+    document.body.classList.remove(MUSIC_CLASS);
+  }
+  processAllVideoElements();
 }
 
 /**
@@ -145,13 +192,23 @@ function init(): void {
   // Process existing elements
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      processAllVideoElements();
+      handleNavigation();
       setupMutationObserver();
     });
   } else {
-    processAllVideoElements();
+    handleNavigation();
     setupMutationObserver();
   }
+
+  // Listen for YouTube navigation (SPA)
+  let lastUrl = location.href;
+  new MutationObserver(() => {
+    const url = location.href;
+    if (url !== lastUrl) {
+      lastUrl = url;
+      handleNavigation();
+    }
+  }).observe(document, { subtree: true, childList: true });
 
   console.log('[YT Overlay] Initialized');
 }

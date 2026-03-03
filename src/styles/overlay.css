@@ -1,72 +1,131 @@
-/* YouTube Overlay - Video Interaction Blocking Styles */
+/* YouTube Overlay - Lightweight and Granular Hiding */
 
-/* Enhanced overlay - completely hide content */
-ytd-thumbnail,
-ytd-video-preview,
-ytd-compact-video-renderer,
-ytd-grid-video-renderer,
-ytd-rich-item-renderer {
+/* Container - disable interactions by default */
+ytd-rich-item-renderer,
+yt-lockup-view-model {
   pointer-events: none !important;
-  cursor: not-allowed !important;
-  user-select: none !important;
-  opacity: 0.05 !important;
-  filter: blur(30px) grayscale(100%) brightness(0.5) !important;
-  transition: none !important;
+  cursor: default !important;
 }
 
-/* Exception: Badge videos remain visible and interactive */
-ytd-thumbnail.yt-overlay-excluded,
-ytd-video-preview.yt-overlay-excluded,
-ytd-compact-video-renderer.yt-overlay-excluded,
-ytd-grid-video-renderer.yt-overlay-excluded,
-ytd-rich-item-renderer.yt-overlay-excluded {
-  opacity: 1 !important;
-  filter: none !important;
-  pointer-events: auto !important;
-  cursor: pointer !important;
-  user-select: auto !important;
+/* Thumbnails and channel images - solid gray */
+ytd-rich-item-renderer .ytThumbnailViewModelImage,
+yt-lockup-view-model .ytThumbnailViewModelImage,
+ytd-rich-item-renderer .ytDecoratedAvatarViewModelHost,
+yt-lockup-view-model .ytDecoratedAvatarViewModelHost {
+  background-color: #404040 !important;
 }
 
-/* Video player */
-#movie_player,
-video,
-.html5-video-player,
-.ytp-play-button,
-.ytp-large-play-button {
-  pointer-events: none !important;
-  cursor: not-allowed !important;
+ytd-rich-item-renderer .ytThumbnailViewModelImage img,
+yt-lockup-view-model .ytThumbnailViewModelImage img,
+ytd-rich-item-renderer .ytDecoratedAvatarViewModelHost img,
+yt-lockup-view-model .ytDecoratedAvatarViewModelHost img {
+  opacity: 0 !important;
 }
 
-/* Related videos and suggestions */
-ytd-compact-video-renderer a,
-ytd-video-renderer a,
-ytd-grid-video-renderer a {
-  pointer-events: none !important;
-  cursor: not-allowed !important;
-}
-
-/* Video cards and end screens */
-.ytp-ce-element,
-.ytp-cards-teaser,
-.ytp-videowall-still {
-  pointer-events: none !important;
+/* Badges and overlays - hide completely */
+ytd-rich-item-renderer .ytThumbnailBottomOverlayViewModelHost,
+yt-lockup-view-model .ytThumbnailBottomOverlayViewModelHost {
   display: none !important;
 }
 
-/* Shorts - enhanced overlay */
-ytd-reel-video-renderer,
-ytd-shorts {
-  pointer-events: none !important;
-  cursor: not-allowed !important;
-  opacity: 0.05 !important;
-  filter: blur(30px) grayscale(100%) brightness(0.5) !important;
+/* Text - same color as background (invisible but present) */
+ytd-rich-item-renderer .yt-core-attributed-string,
+yt-lockup-view-model .yt-core-attributed-string {
+  color: #404040 !important;
+  background-color: #404040 !important;
 }
 
-/* Exception: Badge shorts remain visible */
-ytd-reel-video-renderer.yt-overlay-excluded,
-ytd-shorts.yt-overlay-excluded {
-  opacity: 1 !important;
-  filter: none !important;
+/* Exception: Items with .show class are fully visible and interactive */
+ytd-rich-item-renderer.show,
+yt-lockup-view-model.show {
   pointer-events: auto !important;
   cursor: pointer !important;
+}
+
+ytd-rich-item-renderer.show .ytThumbnailViewModelImage,
+yt-lockup-view-model.show .ytThumbnailViewModelImage,
+ytd-rich-item-renderer.show .ytDecoratedAvatarViewModelHost,
+yt-lockup-view-model.show .ytDecoratedAvatarViewModelHost {
+  background-color: transparent !important;
+}
+
+ytd-rich-item-renderer.show .ytThumbnailViewModelImage img,
+yt-lockup-view-model.show .ytThumbnailViewModelImage img,
+ytd-rich-item-renderer.show .ytDecoratedAvatarViewModelHost img,
+yt-lockup-view-model.show .ytDecoratedAvatarViewModelHost img {
+  opacity: 1 !important;
+}
+
+ytd-rich-item-renderer.show .ytThumbnailBottomOverlayViewModelHost,
+yt-lockup-view-model.show .ytThumbnailBottomOverlayViewModelHost {
+  display: block !important;
+}
+
+ytd-rich-item-renderer.show .yt-core-attributed-string,
+yt-lockup-view-model.show .yt-core-attributed-string {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+/* Video player - disabled by default */
+#movie_player {
+  pointer-events: none !important;
+  cursor: default !important;
+  position: relative !important;
+}
+
+#movie_player::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #404040 !important;
+  z-index: 9999 !important;
+}
+
+/* Enable video player for music */
+body.music #movie_player {
+  pointer-events: auto !important;
+  cursor: default !important;
+}
+
+body.music #movie_player::after {
+  display: none !important;
+}
+
+/* Shorts */
+ytd-reel-video-renderer {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+ytd-reel-video-renderer .ytThumbnailViewModelImage {
+  background-color: #404040 !important;
+}
+
+ytd-reel-video-renderer .ytThumbnailViewModelImage img {
+  opacity: 0 !important;
+}
+
+ytd-reel-video-renderer.show {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+ytd-reel-video-renderer.show .ytThumbnailViewModelImage {
+  background-color: transparent !important;
+}
+
+ytd-reel-video-renderer.show .ytThumbnailViewModelImage img {
+  opacity: 1 !important;
+}
+
+/* End screens - completely hide */
+.ytp-endscreen-content,
+.ytp-ce-element,
+.ytp-cards-teaser,
+.ytp-videowall-still {
+  display: none !important;
 }
