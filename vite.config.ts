@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { copyFileSync, mkdirSync, existsSync } from 'fs';
 
 export default defineConfig({
   build: {
@@ -20,4 +21,5 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  publicDir: 'public',
 });

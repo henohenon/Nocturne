@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Interaction Blocker",
+  "name": "YouTube Overlay",
   "version": "1.0.0",
   "description": "Disable video interactions on YouTube to maintain focus",
   "permissions": [],
