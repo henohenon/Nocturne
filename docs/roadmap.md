@@ -19,6 +19,14 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - [x] lessons.md の精査・更新
 - [x] docs 構造オーバーホール（settings.json, roadmap リネーム, wip アーカイブ, failure prevention 再設計）
 
+## Phase 5.5: プロセス最終調整 🔧
+**目標**: 作業開始フローの確立と lessons.md の完全廃止
+
+### タスク
+- [x] process.md に「作業開始時に roadmap.md 更新」を義務化
+- [x] lessons.md を削除、rules に journal/tasks・archive 読み込みを追加
+- [x] docs/index.md から lessons.md エントリ除去
+
 ## Phase 6: リリース準備
 **目標**: 実運用に向けた準備
 

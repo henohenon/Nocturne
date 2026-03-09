@@ -4,12 +4,14 @@ Think before acting. Design before implementing.
 
 ## Before Starting Any Task
 
-1. Read `docs/index.md` — discover what docs exist and find relevant ones
-2. Read the relevant docs (roadmap, workflow archive, task logs for related areas)
-3. Read `docs/roadmap.md` — current phase and open tasks
-4. Read `docs/backlog.md` — priority-ordered task list (top = highest priority)
+1. Read `docs/index.md` — discover what docs exist
+2. **Update `docs/roadmap.md`** — add the new task(s) under the current phase before doing anything else
+3. Read `docs/roadmap.md` — confirm current phase and open tasks
+4. Read `docs/backlog.md` — confirm priority order
+5. If the task touches a domain with prior history: read relevant `docs/journal/tasks/` and `docs/workflow/*/archive/` files
+6. Spend time here: design, decompose, consider trade-offs before touching files
 
-Do not skip archived docs. They contain context that informs current decisions.
+Do not skip archived docs or prior task logs when working in a related area.
 
 ## Task Breakdown Requirement
 
@@ -28,14 +30,14 @@ For any non-trivial task (changes more than one file, or introduces a new concep
 
 ## After Completing Any Task
 
-1. Move workflow docs: `wip/` → `archive/` for completed work
-2. Update `docs/roadmap.md` — mark completed tasks, remove completed phases
+1. Move workflow docs: `wip/` → `archive/`
+2. Update `docs/roadmap.md` — mark completed tasks, remove completed phases when all done
 3. Write journal: task log at `docs/journal/tasks/<task-name>.md`, link from `docs/journal/YYYY-MM-DD.md`
-4. Commit using the `/commit` skill
+4. Commit
 
 ## When a Mistake Occurs
 
-Document it in the relevant task log (`docs/journal/tasks/`) and add a pointer row to `docs/lessons.md`.
+Document it in the task log (`docs/journal/tasks/<task>.md`). No other action needed.
 
 ## Deviation Rule
 

@@ -7,37 +7,33 @@ Project documentation navigation. Read this first to find relevant docs.
 | File | Purpose |
 |------|---------|
 | `backlog.md` | Prioritized idea list (top = highest priority). Human edits only. |
-| `roadmap.md` | Current and upcoming phases with tasks. |
-| `lessons.md` | Index of known failure areas with links to details. |
+| `roadmap.md` | Current and upcoming phases. Update at task start and task end. |
 
 ## Workflow (`workflow/`)
 
 Design decisions follow: **business/** (Why) → **spec/** (What) → **archi/** (How)
 
 Lifecycle: `wip/` → `archive/`
-`wip/` = in-progress decisions. `archive/` = completed or superseded.
+- `wip/` — in-progress decisions (should be empty when not actively working)
+- `archive/` — completed or superseded decisions; read these for domain history
 
 ### Active (wip/)
-Currently in wip/:
-- `workflow/business/wip/docs-architecture-overhaul.md`
-- `workflow/spec/wip/docs-architecture-overhaul.md`
-- `workflow/archi/wip/docs-architecture-overhaul.md`
-
-### Archived
-All Phase 1–5 decisions are in the respective `archive/` subdirectories.
+- `workflow/business/wip/process-enhancement.md`
+- `workflow/spec/wip/process-enhancement.md`
+- `workflow/archi/wip/process-enhancement.md`
 
 ## Journal (`journal/`)
 
 | Pattern | Purpose |
 |---------|---------|
 | `journal/YYYY-MM-DD.md` | Daily index + AI reflection + human reflection |
-| `journal/tasks/<name>.md` | Per-task work log (detailed) |
+| `journal/tasks/<name>.md` | Per-task work log; read these for domain history and past mistakes |
 
 ## Rules (`.claude/rules/`)
 
 | File | Purpose |
 |------|---------|
-| `process.md` | When and how to act — read before every task |
+| `process.md` | When and how to act — governs all task behavior |
 | `language.md` | Japanese/English split |
 | `workflow.md` | Workflow doc structure and lifecycle |
 | `docs.md` | Doc writing style |
