@@ -1,29 +1,43 @@
-# Documentation Index
+# Docs Index
 
-このドキュメントディレクトリは、プロジェクトの計画、調査、仕様、アーキテクチャを管理するための構造化されたワークフローを提供します。
+Project documentation navigation. Read this first to find relevant docs.
 
-## ディレクトリ構成
+## Core
 
-### backlog/
-アイデアや思いつきを放り込む場所。
-まだ優先度や実施フェーズが決まっていないタスクを一時的に保管します。
+| File | Purpose |
+|------|---------|
+| `backlog.md` | Prioritized idea list (top = highest priority). Human edits only. |
+| `roadmap.md` | Current and upcoming phases with tasks. |
+| `lessons.md` | Index of known failure areas with links to details. |
 
-### roadmap/
-優先度と実施フェーズが決定されたタスク。
-backlogから取り出され、実施計画が明確になったものを管理します。
+## Workflow (`workflow/`)
 
-### workflow/
-具体的な実装作業を深掘りするディレクトリ。
-business (Why) → spec (What) → archi (How) の流れで設計を文書化します。
+Design decisions follow: **business/** (Why) → **spec/** (What) → **archi/** (How)
 
-詳細は [workflow/index.md](workflow/index.md) を参照してください。
+Lifecycle: `wip/` → `archive/`
+`wip/` = in-progress decisions. `archive/` = completed or superseded.
 
-### journal/
-日記・作業ログ。
-日々の作業内容、気づき、メモなどを時系列で記録します。
+### Active (wip/)
+Currently in wip/:
+- `workflow/business/wip/docs-architecture-overhaul.md`
+- `workflow/spec/wip/docs-architecture-overhaul.md`
+- `workflow/archi/wip/docs-architecture-overhaul.md`
 
-**ファイル形式**: `YYYY-MM-DD.md`（例: `2026-03-03.md`）
+### Archived
+All Phase 1–5 decisions are in the respective `archive/` subdirectories.
 
-### rules/
-コード規約・開発ルール（英語・簡潔）。
-AIが読むためのコアルールを文書化します。
+## Journal (`journal/`)
+
+| Pattern | Purpose |
+|---------|---------|
+| `journal/YYYY-MM-DD.md` | Daily index + AI reflection + human reflection |
+| `journal/tasks/<name>.md` | Per-task work log (detailed) |
+
+## Rules (`.claude/rules/`)
+
+| File | Purpose |
+|------|---------|
+| `process.md` | When and how to act — read before every task |
+| `language.md` | Japanese/English split |
+| `workflow.md` | Workflow doc structure and lifecycle |
+| `docs.md` | Doc writing style |

@@ -17,6 +17,7 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - [x] AI の思考プロセス改善（rules/process.md）
 - [x] CLAUDE.md と process.md の重複解消
 - [x] lessons.md の精査・更新
+- [x] docs 構造オーバーホール（settings.json, roadmap リネーム, wip アーカイブ, failure prevention 再設計）
 
 ## Phase 6: リリース準備
 **目標**: 実運用に向けた準備

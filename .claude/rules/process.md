@@ -4,11 +4,10 @@ Think before acting. Design before implementing.
 
 ## Before Starting Any Task
 
-Read in this order:
-1. `docs/roadmap/index.md` — current phase and priorities
-2. `docs/lessons.md` — past mistakes
-3. All relevant `docs/workflow/` docs, including `archive/` subdirectories
-4. `docs/backlog.md` — priority-ordered list (top = highest priority)
+1. Read `docs/index.md` — discover what docs exist and find relevant ones
+2. Read the relevant docs (roadmap, workflow archive, task logs for related areas)
+3. Read `docs/roadmap.md` — current phase and open tasks
+4. Read `docs/backlog.md` — priority-ordered task list (top = highest priority)
 
 Do not skip archived docs. They contain context that informs current decisions.
 
@@ -29,10 +28,14 @@ For any non-trivial task (changes more than one file, or introduces a new concep
 
 ## After Completing Any Task
 
-1. Update `docs/workflow/` lifecycle as needed (wip → adr → archive)
-2. Update `docs/roadmap/index.md` — mark completed tasks, remove completed phases
-3. Write journal: task log at `docs/journal/tasks/NNN-task-name.md`, link from `docs/journal/YYYY-MM-DD.md`
+1. Move workflow docs: `wip/` → `archive/` for completed work
+2. Update `docs/roadmap.md` — mark completed tasks, remove completed phases
+3. Write journal: task log at `docs/journal/tasks/<task-name>.md`, link from `docs/journal/YYYY-MM-DD.md`
 4. Commit using the `/commit` skill
+
+## When a Mistake Occurs
+
+Document it in the relevant task log (`docs/journal/tasks/`) and add a pointer row to `docs/lessons.md`.
 
 ## Deviation Rule
 

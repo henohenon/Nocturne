@@ -1,4 +1,7 @@
-﻿{
+{
+  "permissions": {
+    "allow": ["Edit", "Write", "Read", "Glob", "Grep", "Bash(git *)"]
+  },
   "env": {
     "GIT_AUTHOR_NAME": "Claude Code",
     "GIT_COMMITTER_NAME": "Claude Code",

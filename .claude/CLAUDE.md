@@ -17,7 +17,7 @@ Chrome extension that overlays YouTube videos to block interaction.
 ## Conventions
 - Rules: `.claude/rules/` — read and apply always
 - Process: `.claude/rules/process.md` — governs all task behavior
-- Past mistakes: `docs/lessons.md` — read before acting
+- Docs navigation: `docs/index.md` — start here to find relevant docs
 
 ## Skills
 Skills in `.claude/skills/xxx/SKILL.md`. Available: `/journal`, `/commit`, `/workflow-status`.
