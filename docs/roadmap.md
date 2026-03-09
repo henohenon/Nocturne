@@ -27,6 +27,14 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - [x] lessons.md を削除、rules に journal/tasks・archive 読み込みを追加
 - [x] docs/index.md から lessons.md エントリ除去
 
+## Phase 5.6: pre-task / post-task スキル化 🔧
+
+### タスク
+- [x] process-enhancement wip/ を archive
+- [x] `/pre-task`・`/post-task` スキル作成
+- [x] `process.md` をスキル呼び出しの1行に簡略化
+- [x] `docs/index.md` のスキル一覧を更新
+
 ## Phase 6: リリース準備
 **目標**: 実運用に向けた準備
 

@@ -33,7 +33,7 @@ Lifecycle: `wip/` → `archive/`
 
 | File | Purpose |
 |------|---------|
-| `process.md` | When and how to act — governs all task behavior |
+| `process.md` | When and how to act — delegates to `/pre-task` and `/post-task` |
 | `language.md` | Japanese/English split |
 | `workflow.md` | Workflow doc structure and lifecycle |
 | `docs.md` | Doc writing style |

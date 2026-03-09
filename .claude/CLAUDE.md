@@ -20,4 +20,4 @@ Chrome extension that overlays YouTube videos to block interaction.
 - Docs navigation: `docs/index.md` — start here to find relevant docs
 
 ## Skills
-Skills in `.claude/skills/xxx/SKILL.md`. Available: `/journal`, `/commit`, `/workflow-status`.
+Skills in `.claude/skills/xxx/SKILL.md`. Available: `/pre-task`, `/post-task`, `/journal`, `/commit`, `/workflow-status`.
