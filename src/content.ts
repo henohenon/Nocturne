@@ -5,18 +5,9 @@
  */
 
 import overlayStyles from './styles/overlay.css?inline';
-
-// Configuration
-const BADGE_SELECTOR = '.yt-badge-shape__icon';
-const SHOW_CLASS = 'show';
-const VIDEO_SELECTORS = [
-  'ytd-rich-item-renderer',
-  'ytd-compact-video-renderer',
-  'ytd-grid-video-renderer',
-  'ytd-video-renderer',
-  'yt-lockup-view-model',
-  'ytd-reel-video-renderer',
-];
+import { VIDEO_SELECTORS } from './config';
+import { debounce } from './utils';
+import { processAllVideoElements } from './badge';
 
 /**
  * Inject overlay styles into the page
@@ -38,56 +29,6 @@ function injectOverlayStyles(): void {
   } catch (error) {
     console.error('[YT Overlay] Failed to inject styles:', error);
   }
-}
-
-/**
- * Check if element contains badge icon
- */
-function hasBadge(element: Element): boolean {
-  return element.querySelector(BADGE_SELECTOR) !== null;
-}
-
-/**
- * Process video element for badge detection
- */
-function processVideoElement(element: Element): void {
-  if (hasBadge(element)) {
-    // Badge found - show the element
-    if (!element.classList.contains(SHOW_CLASS)) {
-      element.classList.add(SHOW_CLASS);
-      console.log('[YT Overlay] Badge detected, showing:', element);
-    }
-  } else {
-    // No badge - ensure show class is removed
-    if (element.classList.contains(SHOW_CLASS)) {
-      element.classList.remove(SHOW_CLASS);
-      console.log('[YT Overlay] Badge removed, hiding:', element);
-    }
-  }
-}
-
-/**
- * Process all video elements in the document
- */
-function processAllVideoElements(): void {
-  VIDEO_SELECTORS.forEach((selector) => {
-    const elements = document.querySelectorAll(selector);
-    elements.forEach((element) => processVideoElement(element));
-  });
-}
-
-/**
- * Debounce function to limit execution frequency
- */
-function debounce<T extends (...args: any[]) => void>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-  return (...args: Parameters<T>) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
 }
 
 /**
