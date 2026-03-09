@@ -73,12 +73,12 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 
 ### タスク
 - [x] `.claude/` ディレクトリ設定（CLAUDE.md, rules/, skills/）
-- [ ] skills の階層構造を修正
-- [ ] skills と rules の重複を解消し、適切に分割
-- [ ] backlog が上から優先度順であることを docs に記載
-- [ ] 完了タスクを roadmap から順次廃棄するルールを整備
-- [ ] 一度した失敗を二度としないための docs 再整備
-- [ ] journal 構造の変更（作業単位ファイル + 日次 index に）
+- [x] skills の階層構造を修正（skills/ → commands/）
+- [x] skills と rules の重複を解消し、適切に分割
+- [x] backlog が上から優先度順であることを docs に記載
+- [x] 完了タスクを roadmap から順次廃棄するルールを整備
+- [x] 一度した失敗を二度としないための docs 再整備（docs/lessons.md）
+- [x] journal 構造の変更（tasks/ + 日次 index）
 
 **成果物**:
 - 整備された `.claude/` 設定
@@ -99,5 +99,5 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 
 ---
 
-**現在のフェーズ**: Phase 5（Claude Code / 開発環境整備）
+**現在のフェーズ**: Phase 6（リリース準備）
 **最終更新**: 2026-03-09

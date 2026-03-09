@@ -1,4 +1,4 @@
-# Skill: workflow-status
+# Command: workflow-status
 
 現在のプロジェクト状況を確認して要約する。
 
