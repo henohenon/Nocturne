@@ -68,7 +68,24 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - MutationObserverによる動的コンテンツ対応
 - docs/workflow/spec/wip/003-badge-exclusion-and-enhanced-overlay.md
 
-## Phase 5: リリース準備
+## Phase 5: Claude Code / 開発環境整備 🔧
+**目標**: AI支援開発の基盤を整え、ミスを繰り返さない仕組みを作る
+
+### タスク
+- [x] `.claude/` ディレクトリ設定（CLAUDE.md, rules/, skills/）
+- [ ] skills の階層構造を修正
+- [ ] skills と rules の重複を解消し、適切に分割
+- [ ] backlog が上から優先度順であることを docs に記載
+- [ ] 完了タスクを roadmap から順次廃棄するルールを整備
+- [ ] 一度した失敗を二度としないための docs 再整備
+- [ ] journal 構造の変更（作業単位ファイル + 日次 index に）
+
+**成果物**:
+- 整備された `.claude/` 設定
+- 更新されたドキュメントルール
+- 新しい journal 構造
+
+## Phase 6: リリース準備
 **目標**: 実運用に向けた準備
 
 ### タスク
@@ -82,18 +99,5 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 
 ---
 
-**現在のフェーズ**: Phase 5（リリース準備）
-**最終更新**: 2026-03-03
-
-## 進捗メモ
-- Phase 1-4完了
-- 初回実装での問題点をすべて解決:
-  - ✅ プロジェクト構造整理
-  - ✅ dist/に必要ファイル完備（manifest.json + icons）
-  - ✅ CSS可読性向上（別ファイル分離）
-  - ✅ bunへの移行完了
-  - ✅ Overlay命名への統一
-- Badge検出機能実装:
-  - ✅ `.yt-badge-shape__icon`を持つ動画を除外
-  - ✅ 動的コンテンツに対応（MutationObserver）
-  - ✅ オーバーレイ大幅強化（完全非表示レベル）
+**現在のフェーズ**: Phase 5（Claude Code / 開発環境整備）
+**最終更新**: 2026-03-09
