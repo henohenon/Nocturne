@@ -27,9 +27,11 @@ Quick reference:
 `docs/backlog.md` is ordered top-to-bottom by priority. Read it before picking tasks.
 
 ## Before Starting Any Task
-1. Check `docs/roadmap/index.md` — current phase and open tasks (completed phases are removed)
-2. Review relevant `docs/workflow/` docs if design decisions are involved
-3. Follow design flow: business (Why) → spec (What) → archi (How)
+See `.claude/rules/process.md` for the full process. Summary:
+1. Read `docs/roadmap/index.md`, `docs/lessons.md`, `docs/backlog.md`
+2. Read ALL relevant `docs/workflow/` docs — including `archive/` subdirs
+3. State a concrete task breakdown before touching any file
+4. For non-trivial tasks: create business → spec → archi docs first
 
 ## After Completing Any Task
 1. Update `docs/workflow/` doc lifecycle as needed (wip → adr → archive)
