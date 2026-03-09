@@ -12,7 +12,7 @@ const VIDEO_SELECTORS = [
     'ytd-compact-video-renderer',
     'ytd-grid-video-renderer',
     'ytd-video-renderer',
-    'ytd-item-section-renderer',
+    'yt-lockup-view-model',
     'ytd-reel-video-renderer',
 ];
 /**
@@ -69,43 +69,6 @@ function processAllVideoElements() {
     });
 }
 /**
- * Check if current video is music category
- */
-function checkMusicCategory() {
-    try {
-        // Look for ytInitialPlayerResponse in page scripts
-        const scripts = Array.from(document.querySelectorAll('script'));
-        for (const script of scripts) {
-            const content = script.textContent || '';
-            const match = content.match(/var ytInitialPlayerResponse\s*=\s*({.+?});/);
-            if (match) {
-                const playerResponse = JSON.parse(match[1]);
-                const category = playerResponse?.microformat?.playerMicroformatRenderer?.category;
-                if (category === 'Music') {
-                    document.body.classList.add('music-video');
-                    console.log('[YT Overlay] Music video detected, enabling player');
-                }
-                else {
-                    document.body.classList.remove('music-video');
-                    console.log('[YT Overlay] Non-music video, player disabled');
-                }
-                return;
-            }
-        }
-        // Fallback: check after a delay if not found immediately
-        setTimeout(checkMusicCategory, 1000);
-    }
-    catch (error) {
-        console.error('[YT Overlay] Failed to check music category:', error);
-    }
-}
-/**
- * Check if we're on a watch page
- */
-function isWatchPage() {
-    return window.location.pathname === '/watch';
-}
-/**
  * Debounce function to limit execution frequency
  */
 function debounce(func, wait) {
@@ -149,18 +112,6 @@ function setupMutationObserver() {
     console.log('[YT Overlay] MutationObserver active');
 }
 /**
- * Handle navigation changes (YouTube SPA)
- */
-function handleNavigation() {
-    if (isWatchPage()) {
-        checkMusicCategory();
-    }
-    else {
-        document.body.classList.remove('music-video');
-    }
-    processAllVideoElements();
-}
-/**
  * Initialize the content script
  */
 function init() {
@@ -169,23 +120,12 @@ function init() {
     // Process existing elements
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            handleNavigation();
             setupMutationObserver();
         });
     }
     else {
-        handleNavigation();
         setupMutationObserver();
     }
-    // Listen for YouTube navigation (SPA)
-    let lastUrl = location.href;
-    new MutationObserver(() => {
-        const url = location.href;
-        if (url !== lastUrl) {
-            lastUrl = url;
-            handleNavigation();
-        }
-    }).observe(document, { subtree: true, childList: true });
     console.log('[YT Overlay] Initialized');
 }
 // Run initialization

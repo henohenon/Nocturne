@@ -9,7 +9,6 @@ import overlayStyles from './styles/overlay.css?inline';
 // Configuration
 const BADGE_SELECTOR = '.yt-badge-shape__icon';
 const SHOW_CLASS = 'show';
-const MUSIC_CLASS = 'music';
 const VIDEO_SELECTORS = [
   'ytd-rich-item-renderer',
   'ytd-compact-video-renderer',
@@ -78,46 +77,6 @@ function processAllVideoElements(): void {
 }
 
 /**
- * Check if current video is music category
- */
-function checkMusicCategory(): void {
-  try {
-    // Look for ytInitialPlayerResponse in page scripts
-    const scripts = Array.from(document.querySelectorAll('script'));
-    for (const script of scripts) {
-      const content = script.textContent || '';
-      const match = content.match(/var ytInitialPlayerResponse\s*=\s*({.+?});/);
-
-      if (match) {
-        const playerResponse = JSON.parse(match[1]);
-        const category = playerResponse?.microformat?.playerMicroformatRenderer?.category;
-
-        if (category === 'Music') {
-          document.body.classList.add(MUSIC_CLASS);
-          console.log('[YT Overlay] Music detected, enabling player');
-        } else {
-          document.body.classList.remove(MUSIC_CLASS);
-          console.log('[YT Overlay] Non-music, player disabled');
-        }
-        return;
-      }
-    }
-
-    // Fallback: check after a delay if not found immediately
-    setTimeout(checkMusicCategory, 1000);
-  } catch (error) {
-    console.error('[YT Overlay] Failed to check music category:', error);
-  }
-}
-
-/**
- * Check if we're on a watch page
- */
-function isWatchPage(): boolean {
-  return window.location.pathname === '/watch';
-}
-
-/**
  * Debounce function to limit execution frequency
  */
 function debounce<T extends (...args: any[]) => void>(
@@ -171,18 +130,6 @@ function setupMutationObserver(): void {
 }
 
 /**
- * Handle navigation changes (YouTube SPA)
- */
-function handleNavigation(): void {
-  if (isWatchPage()) {
-    checkMusicCategory();
-  } else {
-    document.body.classList.remove(MUSIC_CLASS);
-  }
-  processAllVideoElements();
-}
-
-/**
  * Initialize the content script
  */
 function init(): void {
@@ -192,23 +139,11 @@ function init(): void {
   // Process existing elements
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      handleNavigation();
       setupMutationObserver();
     });
   } else {
-    handleNavigation();
     setupMutationObserver();
   }
-
-  // Listen for YouTube navigation (SPA)
-  let lastUrl = location.href;
-  new MutationObserver(() => {
-    const url = location.href;
-    if (url !== lastUrl) {
-      lastUrl = url;
-      handleNavigation();
-    }
-  }).observe(document, { subtree: true, childList: true });
 
   console.log('[YT Overlay] Initialized');
 }
