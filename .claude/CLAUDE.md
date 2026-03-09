@@ -20,7 +20,7 @@ See `docs/lessons.md` for past mistakes — read before acting.
 
 Quick reference:
 - Language: Japanese for human-facing docs, English for code/commits/other docs
-- Commits: Conventional Commits, imperative, <50 chars subject
+- Commits: see `/commit` skill for format
 - Docs: High-level and durable — avoid implementation details
 
 ## Backlog
@@ -35,7 +35,7 @@ Quick reference:
 1. Update `docs/workflow/` doc lifecycle as needed (wip → adr → archive)
 2. Update `docs/roadmap/index.md` — remove completed phases, update current phase tasks
 3. Write or update today's journal: `docs/journal/YYYY-MM-DD.md` (index + reflection) and task log `docs/journal/tasks/NNN-task-name.md`
-4. Commit following `.claude/rules/commits.md`
+4. Commit using the `/commit` skill
 
-## Commands
-Slash commands are in `.claude/commands/`. Use `/journal`, `/commit`, `/workflow-status`.
+## Skills
+Skills are in `.claude/skills/xxx/SKILL.md`. Use `/journal`, `/commit`, `/workflow-status`.
