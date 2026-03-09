@@ -6,9 +6,24 @@ Write today's work log. Task logs are written in Japanese.
 
 ```
 docs/journal/
-├── YYYY-MM-DD.md     # daily: task index + brief reflection (human writes reflection)
+├── YYYY-MM-DD.md     # daily: task index + AI reflection + human reflection
 └── tasks/
     └── task-name.md  # per-task work log (AI writes this)
+```
+
+## Daily File Format
+
+```markdown
+# YYYY-MM-DD
+
+## 作業ログ
+- [task-name](tasks/task-name.md)
+
+## GCされなかった思考
+（AIの所感・気づき・ひとりごと）
+
+## 人間さんの記述
+（人間が書く — AI は書かない）
 ```
 
 ## Steps
@@ -17,7 +32,8 @@ docs/journal/
 2. Create a task log at `docs/journal/tasks/<task-name>.md`
    - Use a descriptive kebab-case name (no number prefix)
 3. Add a link in `docs/journal/<today>.md` under `## 作業ログ` (create file if missing)
-4. Ensure `docs/journal/<today>.md` has a `## 振り返り` section for human reflection
+4. Write `## GCされなかった思考` — AI's own reflection on the session
+5. Leave `## 人間さんの記述` blank for the human
 
 ## Task Log Contents
 
@@ -29,6 +45,6 @@ docs/journal/
 
 ## Rules
 
-- AI does not write the `## 振り返り` section — human only
+- AI does not write the `## 人間さんの記述` section — human only
+- `## GCされなかった思考` is AI's genuine reflection, not a summary of the task log
 - Write task logs after completing or pausing any meaningful work
-- Update the daily index at end of session
