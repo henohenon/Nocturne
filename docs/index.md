@@ -7,7 +7,7 @@ Project documentation navigation. Read this first to find relevant docs.
 | File | Purpose |
 |------|---------|
 | `backlog.md` | Prioritized idea list (top = highest priority). Human edits only. |
-| `roadmap.md` | Current and upcoming phases. Update at task start and task end. |
+| `roadmap.md` | Live snapshot: active phase + next planned phase only. Rewritten each task; completed phases are not kept here. |
 
 ## Workflow (`workflow/`)
 
