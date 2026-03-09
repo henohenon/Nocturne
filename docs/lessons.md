@@ -1,33 +1,43 @@
 # Lessons Learned
 
-過去に発生したミスと対策。作業前に必ず確認すること。
+Past mistakes and how to avoid them. Read before acting.
 
 ---
 
-## L-001: `.claude/skills/` は Claude Code の標準ディレクトリではない
+## L-001: Wrong skill directory structure
 
-**何が起きたか**: スラッシュコマンドを `skills/` に配置したが、Claude Code はこのディレクトリを認識しない。
+**What**: Created skills as flat `.claude/skills/name.md` files instead of `.claude/skills/name/SKILL.md`.
 
-**なぜ起きたか**: Claude Code のコマンドディレクトリを確認せずに命名した。
+**Why**: Assumed a flat structure without checking the required format.
 
-**対策**: スラッシュコマンドは必ず `.claude/commands/` に配置する。
-
----
-
-## L-002: rules と commands にコンテンツが重複した
-
-**何が起きたか**: `commands/commit.md` にコミットフォーマットを書いたが、同じ内容が `rules/commits.md` にも存在した。
-
-**なぜ起きたか**: commands 作成時に rules の内容を参照せず書き直した。
-
-**対策**: commands はルールを参照するだけにする。コンテンツは rules が唯一の情報源。
+**Do instead**: Always use `.claude/skills/xxx/SKILL.md` — each skill in its own subdirectory.
 
 ---
 
-## L-003: docs/rules/ を .claude/rules/ に移行した際にファイルが削除扱いになった
+## L-002: Duplicated content between rules and skills
 
-**何が起きたか**: git 上で `docs/rules/` 配下のファイルが staged delete 状態になっており、コミット時に意図せず削除された。
+**What**: Wrote commit format details in both a rule file and a skill file simultaneously.
 
-**なぜ起きたか**: git status で staged 変更を事前確認しなかった。
+**Why**: Created a skill without checking whether a rule file already covered the same content.
 
-**対策**: コミット前に必ず `git status` で staged 変更を確認し、意図しない削除がないか確認する。
+**Do instead**: Decide ownership before writing. Rules own conventions; skills own execution steps. When a skill needs convention details, integrate the rule content into the skill and delete the rule file.
+
+---
+
+## L-003: Unintended file deletion on commit
+
+**What**: `docs/rules/` files were staged as deleted and removed when committing an unrelated change.
+
+**Why**: Did not run `git status` before committing to verify staged changes.
+
+**Do instead**: Always run `git status` before staging or committing. Confirm no unintended deletions are staged.
+
+---
+
+## L-004: Workflow docs left stale after implementation
+
+**What**: `archi/002` still referenced `commands/` structure after the project moved to `skills/xxx/SKILL.md`.
+
+**Why**: Workflow docs were not archived after the decisions they described were implemented and superseded.
+
+**Do instead**: After completing a task, move the corresponding workflow docs from `wip/` to `archive/`. Stale wip docs mislead future decisions.

@@ -27,6 +27,13 @@ For any non-trivial task (changes more than one file, or introduces a new concep
 3. Create `docs/workflow/archi/wip/` doc (How)
 4. Only then implement
 
+## After Completing Any Task
+
+1. Update `docs/workflow/` lifecycle as needed (wip → adr → archive)
+2. Update `docs/roadmap/index.md` — mark completed tasks, remove completed phases
+3. Write journal: task log at `docs/journal/tasks/NNN-task-name.md`, link from `docs/journal/YYYY-MM-DD.md`
+4. Commit using the `/commit` skill
+
 ## Deviation Rule
 
 No silent scope changes. If execution diverges from the stated plan, stop and explain.

@@ -15,6 +15,8 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - [x] commands を `.claude/skills/xxx/SKILL.md` 形式に変更
 - [x] journal 記入
 - [x] AI の思考プロセス改善（rules/process.md）
+- [x] CLAUDE.md と process.md の重複解消
+- [x] lessons.md の精査・更新
 
 ## Phase 6: リリース準備
 **目標**: 実運用に向けた準備
