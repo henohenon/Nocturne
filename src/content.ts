@@ -5,9 +5,13 @@
  */
 
 import overlayStyles from './styles/overlay.css?inline';
-import { VIDEO_SELECTORS } from './config';
+import { VIDEO_SELECTORS, DISABLE_DURATION_MS } from './config';
 import { debounce } from './utils';
 import { processAllVideoElements } from './badge';
+
+// Disable state
+let disableTimerId: ReturnType<typeof setTimeout> | null = null;
+let disableEndTime: number | null = null;
 
 /**
  * Inject overlay styles into the page
@@ -30,6 +34,60 @@ function injectOverlayStyles(): void {
     console.error('[YT Overlay] Failed to inject styles:', error);
   }
 }
+
+/**
+ * Remove overlay styles from the page
+ */
+function removeOverlayStyles(): void {
+  const el = document.getElementById('yt-overlay-styles');
+  if (el) el.remove();
+}
+
+/**
+ * Disable the overlay for DISABLE_DURATION_MS, then re-enable automatically
+ */
+function disableOverlay(): void {
+  removeOverlayStyles();
+  disableEndTime = Date.now() + DISABLE_DURATION_MS;
+  if (disableTimerId) clearTimeout(disableTimerId);
+  disableTimerId = setTimeout(() => enableOverlay(), DISABLE_DURATION_MS);
+  console.log('[YT Overlay] Disabled for 3 minutes');
+}
+
+/**
+ * Re-enable the overlay immediately
+ */
+function enableOverlay(): void {
+  if (disableTimerId) {
+    clearTimeout(disableTimerId);
+    disableTimerId = null;
+  }
+  disableEndTime = null;
+  injectOverlayStyles();
+  processAllVideoElements();
+  console.log('[YT Overlay] Re-enabled');
+}
+
+/**
+ * Handle messages from the popup
+ */
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type === 'GET_STATE') {
+    const remaining = disableEndTime ? Math.max(0, disableEndTime - Date.now()) : 0;
+    sendResponse({ disabled: remaining > 0, remainingMs: remaining });
+    return true;
+  }
+  if (message.type === 'DISABLE') {
+    disableOverlay();
+    sendResponse({ ok: true });
+    return true;
+  }
+  if (message.type === 'ENABLE') {
+    enableOverlay();
+    sendResponse({ ok: true });
+    return true;
+  }
+});
 
 /**
  * Setup MutationObserver to watch for dynamic content
@@ -60,8 +118,7 @@ function setupMutationObserver(): void {
     }
   });
 
-  const targetNode = document.body;
-  observer.observe(targetNode, {
+  observer.observe(document.body, {
     childList: true,
     subtree: true,
     attributes: false,
@@ -74,10 +131,8 @@ function setupMutationObserver(): void {
  * Initialize the content script
  */
 function init(): void {
-  // Inject styles immediately
   injectOverlayStyles();
 
-  // Process existing elements
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       setupMutationObserver();

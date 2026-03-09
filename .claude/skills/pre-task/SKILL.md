@@ -5,7 +5,7 @@ Run this before starting any task.
 ## Steps
 
 1. **Archive stale docs** — if any `docs/workflow/*/adr/` files remain from a previously completed task, move them to `archive/` now
-2. **Rewrite roadmap** — `docs/roadmap.md` is a live snapshot, not a history. Rewrite it to show only: the active phase (current task) + the next planned phase if known. Remove completed phases entirely — their record lives in `docs/journal/tasks/` and `docs/workflow/*/archive/`.
+2. **Update roadmap** — add the new task as a new phase in `docs/roadmap.md`. Mark previously completed tasks with ✅ if not already done. Do not delete old phases — history stays visible.
 3. **Read `docs/index.md`** — get an overview of what docs exist
 4. **Read relevant history** — for the task's domain, read related files from:
    - `docs/journal/tasks/` (past task logs)

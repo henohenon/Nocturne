@@ -5,8 +5,7 @@ Run this after completing any task.
 ## Steps
 
 1. **Move adr/ → archive/** — move this task's `docs/workflow/*/adr/` files to `archive/` (automatic, no user approval needed)
-2. **Update roadmap** — mark completed tasks in `docs/roadmap.md`; remove phases where all tasks are done
-3. **Write task log** — create `docs/journal/tasks/<task-name>.md` with:
+2. **Write task log** — create `docs/journal/tasks/<task-name>.md` with:
    - Tasks completed
    - Decisions made (options, choice, why)
    - Learnings and insights

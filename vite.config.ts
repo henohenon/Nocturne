@@ -1,25 +1,24 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import { copyFileSync, mkdirSync, existsSync } from 'fs';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
+    emptyOutDir: mode !== 'popup',
     rollupOptions: {
-      input: {
-        content: resolve(__dirname, 'src/content.ts'),
-      },
+      input: mode === 'popup'
+        ? { popup: resolve(__dirname, 'src/popup.ts') }
+        : { content: resolve(__dirname, 'src/content.ts') },
       output: {
         entryFileNames: '[name].js',
         format: 'iife',
       },
     },
   },
+  publicDir: mode === 'popup' ? false : 'public',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
     },
   },
-  publicDir: 'public',
-});
+}));

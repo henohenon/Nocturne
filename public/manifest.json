@@ -3,7 +3,11 @@
   "name": "YouTube Overlay",
   "version": "1.0.0",
   "description": "Disable video interactions on YouTube to maintain focus",
-  "permissions": [],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube Overlay"
+  },
+  "permissions": ["tabs"],
   "host_permissions": [
     "*://*.youtube.com/*"
   ],
