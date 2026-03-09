@@ -12,11 +12,12 @@ Run `/post-task`.
 
 ## Design-First Requirement
 
-For any non-trivial task (changes more than one file, or introduces a new concept):
+For any task that requires design judgment (unclear approach, architectural impact, or non-obvious trade-offs):
 1. Create `docs/workflow/business/wip/` doc (Why)
 2. Create `docs/workflow/spec/wip/` doc (What)
 3. Create `docs/workflow/archi/wip/` doc (How)
-4. Only then implement
+4. Iterate in wip/ until the approach is settled
+5. Move wip/ → adr/ when execution begins; only then implement
 
 ## Task Breakdown Requirement
 

@@ -35,6 +35,16 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - [x] `process.md` をスキル呼び出しの1行に簡略化
 - [x] `docs/index.md` のスキル一覧を更新
 
+## Phase 5.7: ワークフロー再設計 🔧
+
+### タスク
+- [x] CLAUDE.md に pre-task 読み込み指示を追加
+- [x] `rules/workflow.md` を wip/adr/archive セマンティクスで再定義
+- [x] `skills/pre-task/SKILL.md` に反復ループ（3問自己レビュー）を追加
+- [x] `skills/post-task/SKILL.md` を wip→adr→archive フローに更新
+- [x] `process.md` のデザインファースト閾値を定性的判断に変更
+- [x] `docs/index.md` の wip ファイル一覧を削除
+
 ## Phase 6: リリース準備
 **目標**: 実運用に向けた準備
 
@@ -50,4 +60,4 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 ---
 
 **現在のフェーズ**: Phase 6（リリース準備）
-**最終更新**: 2026-03-09
+**最終更新**: 2026-03-09 (Phase 5.7 追加)

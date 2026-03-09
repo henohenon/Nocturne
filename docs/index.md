@@ -17,11 +17,6 @@ Lifecycle: `wip/` → `archive/`
 - `wip/` — in-progress decisions (should be empty when not actively working)
 - `archive/` — completed or superseded decisions; read these for domain history
 
-### Active (wip/)
-- `workflow/business/wip/process-enhancement.md`
-- `workflow/spec/wip/process-enhancement.md`
-- `workflow/archi/wip/process-enhancement.md`
-
 ## Journal (`journal/`)
 
 | Pattern | Purpose |

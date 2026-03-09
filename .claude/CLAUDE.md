@@ -1,3 +1,5 @@
+> **First**: before any work, read `.claude/skills/pre-task/SKILL.md` and execute it.
+
 # yt-overlay
 
 Chrome extension that overlays YouTube videos to block interaction.
