@@ -2,20 +2,23 @@
  * YouTube Overlay - Extension Popup
  */
 
-const STORAGE_KEY = 'disableDurationMs';
-const DEFAULT_DURATION_MS = 180000;
+const STORAGE_KEY = 'disableDurationMin';
+const DEFAULT_DURATION_MIN = 3;
+const MAX_DURATION_MIN = 20;
 
 const statusEl = document.getElementById('status')!;
 const toggleBtn = document.getElementById('toggle') as HTMLButtonElement;
-const durationSelect = document.getElementById('duration') as HTMLSelectElement;
+const durationInput = document.getElementById('duration') as HTMLInputElement;
 
 let countdownInterval: ReturnType<typeof setInterval> | null = null;
 
 /**
- * Get the selected duration in milliseconds
+ * Get the selected duration in milliseconds, clamped to 1–20 min
  */
-function getSelectedDuration(): number {
-  return parseInt(durationSelect.value, 10);
+function getSelectedDurationMs(): number {
+  const minutes = Math.max(1, Math.min(MAX_DURATION_MIN, parseInt(durationInput.value, 10) || DEFAULT_DURATION_MIN));
+  durationInput.value = String(minutes);
+  return minutes * 60 * 1000;
 }
 
 /**
@@ -38,7 +41,7 @@ function setDisabledUI(remainingMs: number): void {
   statusEl.className = 'disabled';
   toggleBtn.textContent = '今すぐ再有効化';
   toggleBtn.className = 'active';
-  durationSelect.disabled = true;
+  durationInput.disabled = true;
 
   const endTime = Date.now() + remainingMs;
   countdownInterval = setInterval(() => {
@@ -63,7 +66,7 @@ function setEnabledUI(): void {
   statusEl.className = '';
   toggleBtn.textContent = '無効化';
   toggleBtn.className = '';
-  durationSelect.disabled = false;
+  durationInput.disabled = false;
 }
 
 /**
@@ -79,14 +82,15 @@ async function sendToContentScript(message: Record<string, unknown>): Promise<an
   }
 }
 
-// Restore saved duration preference, then fetch current state
+// Restore saved duration preference
 chrome.storage.local.get(STORAGE_KEY, (result) => {
-  const saved = result[STORAGE_KEY];
-  if (saved && durationSelect.querySelector(`option[value="${saved}"]`)) {
-    durationSelect.value = String(saved);
+  const saved = result[STORAGE_KEY] as number | undefined;
+  if (saved && saved >= 1 && saved <= MAX_DURATION_MIN) {
+    durationInput.value = String(saved);
   }
 });
 
+// Fetch current state from content script
 sendToContentScript({ type: 'GET_STATE' }).then((state) => {
   if (state?.disabled) {
     setDisabledUI(state.remainingMs);
@@ -96,8 +100,10 @@ sendToContentScript({ type: 'GET_STATE' }).then((state) => {
 });
 
 // Persist duration choice on change
-durationSelect.addEventListener('change', () => {
-  chrome.storage.local.set({ [STORAGE_KEY]: getSelectedDuration() });
+durationInput.addEventListener('change', () => {
+  const minutes = Math.max(1, Math.min(MAX_DURATION_MIN, parseInt(durationInput.value, 10) || DEFAULT_DURATION_MIN));
+  durationInput.value = String(minutes);
+  chrome.storage.local.set({ [STORAGE_KEY]: minutes });
 });
 
 // Toggle button click
@@ -106,7 +112,7 @@ toggleBtn.addEventListener('click', async () => {
     await sendToContentScript({ type: 'ENABLE' });
     setEnabledUI();
   } else {
-    const durationMs = getSelectedDuration();
+    const durationMs = getSelectedDurationMs();
     await sendToContentScript({ type: 'DISABLE', durationMs });
     setDisabledUI(durationMs);
   }
