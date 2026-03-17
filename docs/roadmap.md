@@ -19,6 +19,11 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - [x] post-task でロードマップ更新ナシに
 - [x] pre-task で前フェーズを ✅ 追記する方式に
 
+## 一時停止 duration をユーザー変更可能に
+- [x] popup に duration 選択ドロップダウンを追加（1分/3分/5分/10分）
+- [x] 選択値を chrome.storage.local に保存
+- [x] DISABLE メッセージで duration を content script に渡す
+
 ---
 
-**最終更新**: 2026-03-09
+**最終更新**: 2026-03-18

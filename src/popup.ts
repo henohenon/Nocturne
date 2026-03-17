@@ -2,12 +2,21 @@
  * YouTube Overlay - Extension Popup
  */
 
-const DISABLE_DURATION_MS = 3 * 60 * 1000;
+const STORAGE_KEY = 'disableDurationMs';
+const DEFAULT_DURATION_MS = 180000;
 
 const statusEl = document.getElementById('status')!;
 const toggleBtn = document.getElementById('toggle') as HTMLButtonElement;
+const durationSelect = document.getElementById('duration') as HTMLSelectElement;
 
 let countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * Get the selected duration in milliseconds
+ */
+function getSelectedDuration(): number {
+  return parseInt(durationSelect.value, 10);
+}
 
 /**
  * Format remaining milliseconds as M:SS
@@ -20,7 +29,7 @@ function formatTime(ms: number): string {
 }
 
 /**
- * Update UI to reflect current state
+ * Update UI to reflect disabled state
  */
 function setDisabledUI(remainingMs: number): void {
   if (countdownInterval) clearInterval(countdownInterval);
@@ -29,6 +38,7 @@ function setDisabledUI(remainingMs: number): void {
   statusEl.className = 'disabled';
   toggleBtn.textContent = '今すぐ再有効化';
   toggleBtn.className = 'active';
+  durationSelect.disabled = true;
 
   const endTime = Date.now() + remainingMs;
   countdownInterval = setInterval(() => {
@@ -41,6 +51,9 @@ function setDisabledUI(remainingMs: number): void {
   }, 500);
 }
 
+/**
+ * Update UI to reflect enabled state
+ */
 function setEnabledUI(): void {
   if (countdownInterval) {
     clearInterval(countdownInterval);
@@ -48,14 +61,15 @@ function setEnabledUI(): void {
   }
   statusEl.textContent = '有効';
   statusEl.className = '';
-  toggleBtn.textContent = '3分間 無効化';
+  toggleBtn.textContent = '無効化';
   toggleBtn.className = '';
+  durationSelect.disabled = false;
 }
 
 /**
  * Send a message to the active tab's content script
  */
-async function sendToContentScript(message: { type: string }): Promise<any> {
+async function sendToContentScript(message: Record<string, unknown>): Promise<any> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return null;
   try {
@@ -65,7 +79,14 @@ async function sendToContentScript(message: { type: string }): Promise<any> {
   }
 }
 
-// On popup open: fetch current state from content script
+// Restore saved duration preference, then fetch current state
+chrome.storage.local.get(STORAGE_KEY, (result) => {
+  const saved = result[STORAGE_KEY];
+  if (saved && durationSelect.querySelector(`option[value="${saved}"]`)) {
+    durationSelect.value = String(saved);
+  }
+});
+
 sendToContentScript({ type: 'GET_STATE' }).then((state) => {
   if (state?.disabled) {
     setDisabledUI(state.remainingMs);
@@ -74,18 +95,19 @@ sendToContentScript({ type: 'GET_STATE' }).then((state) => {
   }
 });
 
+// Persist duration choice on change
+durationSelect.addEventListener('change', () => {
+  chrome.storage.local.set({ [STORAGE_KEY]: getSelectedDuration() });
+});
+
 // Toggle button click
 toggleBtn.addEventListener('click', async () => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id) return;
-
   if (toggleBtn.className === 'active') {
-    // Currently disabled → enable
-    await chrome.tabs.sendMessage(tab.id, { type: 'ENABLE' });
+    await sendToContentScript({ type: 'ENABLE' });
     setEnabledUI();
   } else {
-    // Currently enabled → disable
-    await chrome.tabs.sendMessage(tab.id, { type: 'DISABLE' });
-    setDisabledUI(DISABLE_DURATION_MS);
+    const durationMs = getSelectedDuration();
+    await sendToContentScript({ type: 'DISABLE', durationMs });
+    setDisabledUI(durationMs);
   }
 });

@@ -5,7 +5,7 @@
  */
 
 import overlayStyles from './styles/overlay.css?inline';
-import { VIDEO_SELECTORS, DISABLE_DURATION_MS } from './config';
+import { VIDEO_SELECTORS } from './config';
 import { debounce } from './utils';
 import { processAllVideoElements } from './badge';
 
@@ -44,14 +44,14 @@ function removeOverlayStyles(): void {
 }
 
 /**
- * Disable the overlay for DISABLE_DURATION_MS, then re-enable automatically
+ * Disable the overlay for the given duration, then re-enable automatically
  */
-function disableOverlay(): void {
+function disableOverlay(durationMs: number): void {
   removeOverlayStyles();
-  disableEndTime = Date.now() + DISABLE_DURATION_MS;
+  disableEndTime = Date.now() + durationMs;
   if (disableTimerId) clearTimeout(disableTimerId);
-  disableTimerId = setTimeout(() => enableOverlay(), DISABLE_DURATION_MS);
-  console.log('[YT Overlay] Disabled for 3 minutes');
+  disableTimerId = setTimeout(() => enableOverlay(), durationMs);
+  console.log(`[YT Overlay] Disabled for ${Math.round(durationMs / 1000)}s`);
 }
 
 /**
@@ -78,7 +78,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
   if (message.type === 'DISABLE') {
-    disableOverlay();
+    disableOverlay(message.durationMs);
     sendResponse({ ok: true });
     return true;
   }
