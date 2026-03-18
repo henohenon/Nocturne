@@ -13,6 +13,13 @@ const durationInput = document.getElementById('duration') as HTMLInputElement;
 let countdownInterval: ReturnType<typeof setInterval> | null = null;
 
 /**
+ * Get cooldown duration in ms from input current value
+ */
+function getCooldownMs(): number {
+  return getSelectedDurationMs();
+}
+
+/**
  * Get the selected duration in milliseconds, clamped to 1–20 min
  */
 function getSelectedDurationMs(): number {
@@ -47,7 +54,7 @@ function setDisabledUI(remainingMs: number): void {
   countdownInterval = setInterval(() => {
     const left = endTime - Date.now();
     if (left <= 0) {
-      setEnabledUI();
+      setCooldownUI(getCooldownMs());
     } else {
       statusEl.textContent = `無効中 ${formatTime(left)}`;
     }
@@ -67,6 +74,29 @@ function setEnabledUI(): void {
   toggleBtn.textContent = '無効化';
   toggleBtn.className = '';
   durationInput.disabled = false;
+}
+
+/**
+ * Update UI to reflect cooldown state
+ */
+function setCooldownUI(remainingMs: number): void {
+  if (countdownInterval) clearInterval(countdownInterval);
+
+  statusEl.textContent = `有効（待機 ${formatTime(remainingMs)}）`;
+  statusEl.className = '';
+  toggleBtn.textContent = '待機中...';
+  toggleBtn.className = 'cooldown';
+  durationInput.disabled = true;
+
+  const endTime = Date.now() + remainingMs;
+  countdownInterval = setInterval(() => {
+    const left = endTime - Date.now();
+    if (left <= 0) {
+      setEnabledUI();
+    } else {
+      statusEl.textContent = `有効（待機 ${formatTime(left)}）`;
+    }
+  }, 500);
 }
 
 /**
@@ -94,6 +124,8 @@ chrome.storage.local.get(STORAGE_KEY, (result) => {
 sendToContentScript({ type: 'GET_STATE' }).then((state) => {
   if (state?.disabled) {
     setDisabledUI(state.remainingMs);
+  } else if (state?.cooldown) {
+    setCooldownUI(state.cooldownMs);
   } else {
     setEnabledUI();
   }
@@ -108,12 +140,16 @@ durationInput.addEventListener('change', () => {
 
 // Toggle button click
 toggleBtn.addEventListener('click', async () => {
-  if (toggleBtn.className === 'active') {
-    await sendToContentScript({ type: 'ENABLE' });
-    setEnabledUI();
+  if (toggleBtn.className === 'cooldown') {
+    return;
+  } else if (toggleBtn.className === 'active') {
+    const cooldownMs = getCooldownMs();
+    await sendToContentScript({ type: 'ENABLE', cooldownMs });
+    setCooldownUI(cooldownMs);
   } else {
     const durationMs = getSelectedDurationMs();
-    await sendToContentScript({ type: 'DISABLE', durationMs });
+    const cooldownMs = getCooldownMs();
+    await sendToContentScript({ type: 'DISABLE', durationMs, cooldownMs });
     setDisabledUI(durationMs);
   }
 });

@@ -13,6 +13,12 @@ import { processAllVideoElements } from './badge';
 let disableTimerId: ReturnType<typeof setTimeout> | null = null;
 let disableEndTime: number | null = null;
 
+// Cooldown state
+const COOLDOWN_STORAGE_KEY = 'cooldownEndTime';
+let cooldownTimerId: ReturnType<typeof setTimeout> | null = null;
+let cooldownEndTime: number | null = null;
+let pendingCooldownMs: number = 0;
+
 /**
  * Inject overlay styles into the page
  */
@@ -55,7 +61,7 @@ function disableOverlay(durationMs: number): void {
 }
 
 /**
- * Re-enable the overlay immediately
+ * Re-enable the overlay and start cooldown
  */
 function enableOverlay(): void {
   if (disableTimerId) {
@@ -65,7 +71,46 @@ function enableOverlay(): void {
   disableEndTime = null;
   injectOverlayStyles();
   processAllVideoElements();
+  if (pendingCooldownMs > 0) startCooldown(pendingCooldownMs);
   console.log('[YT Overlay] Re-enabled');
+}
+
+/**
+ * Start cooldown period during which disable is blocked
+ */
+function startCooldown(durationMs: number): void {
+  cooldownEndTime = Date.now() + durationMs;
+  chrome.storage.local.set({ [COOLDOWN_STORAGE_KEY]: cooldownEndTime });
+  if (cooldownTimerId) clearTimeout(cooldownTimerId);
+  cooldownTimerId = setTimeout(() => {
+    cooldownEndTime = null;
+    cooldownTimerId = null;
+    chrome.storage.local.remove(COOLDOWN_STORAGE_KEY);
+    console.log('[YT Overlay] Cooldown ended');
+  }, durationMs);
+}
+
+/**
+ * Restore cooldown from storage if still active
+ */
+function restoreCooldown(): void {
+  chrome.storage.local.get(COOLDOWN_STORAGE_KEY, (result) => {
+    const saved = result[COOLDOWN_STORAGE_KEY] as number | undefined;
+    if (!saved) return;
+    const remaining = saved - Date.now();
+    if (remaining > 0) {
+      cooldownEndTime = saved;
+      cooldownTimerId = setTimeout(() => {
+        cooldownEndTime = null;
+        cooldownTimerId = null;
+        chrome.storage.local.remove(COOLDOWN_STORAGE_KEY);
+        console.log('[YT Overlay] Cooldown ended');
+      }, remaining);
+      console.log(`[YT Overlay] Cooldown restored, ${Math.round(remaining / 1000)}s remaining`);
+    } else {
+      chrome.storage.local.remove(COOLDOWN_STORAGE_KEY);
+    }
+  });
 }
 
 /**
@@ -74,15 +119,23 @@ function enableOverlay(): void {
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'GET_STATE') {
     const remaining = disableEndTime ? Math.max(0, disableEndTime - Date.now()) : 0;
-    sendResponse({ disabled: remaining > 0, remainingMs: remaining });
+    const cooldownRemaining = cooldownEndTime ? Math.max(0, cooldownEndTime - Date.now()) : 0;
+    sendResponse({ disabled: remaining > 0, remainingMs: remaining, cooldown: cooldownRemaining > 0, cooldownMs: cooldownRemaining });
     return true;
   }
   if (message.type === 'DISABLE') {
+    if (cooldownEndTime && cooldownEndTime > Date.now()) {
+      const cooldownRemaining = Math.max(0, cooldownEndTime - Date.now());
+      sendResponse({ ok: false, cooldown: true, cooldownMs: cooldownRemaining });
+      return true;
+    }
+    pendingCooldownMs = message.cooldownMs || 0;
     disableOverlay(message.durationMs);
     sendResponse({ ok: true });
     return true;
   }
   if (message.type === 'ENABLE') {
+    pendingCooldownMs = message.cooldownMs || 0;
     enableOverlay();
     sendResponse({ ok: true });
     return true;
@@ -132,6 +185,7 @@ function setupMutationObserver(): void {
  */
 function init(): void {
   injectOverlayStyles();
+  restoreCooldown();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
