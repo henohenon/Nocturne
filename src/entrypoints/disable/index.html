@@ -46,14 +46,31 @@
       18% { box-shadow: inset 0 0 calc(60px + var(--k, 0) * 40px) calc(8px + var(--k, 0) * 14px) rgba(200, 40, 60, 0.3); }
       26% { box-shadow: inset 0 0 calc(85px + var(--k, 0) * 50px) calc(16px + var(--k, 0) * 24px) rgba(200, 40, 60, 0.45); }
     }
-    /* At the maximum the whole window trembles */
-    body.max { animation: heartbeat var(--beat, 1.6s) ease-out infinite, shake 0.11s steps(2) infinite; }
-    /* The shake nudges the page 1px past the window; hide the scrollbar it would bring (only while shaking) */
+    /* At the maximum the whole window jolts once, then keeps shaking irregularly */
+    body.max { animation: heartbeat var(--beat, 1.6s) ease-out infinite, shake 0.42s steps(1) infinite, jolt 0.45s ease-out; }
+    /* The shake pushes the page past the window; hide the scrollbar it would bring (only while shaking) */
     html:has(body.max) { overflow: hidden; }
     @keyframes shake {
       0% { transform: translate(0, 0); }
-      50% { transform: translate(1px, -1px); }
-      100% { transform: translate(-1px, 1px); }
+      8% { transform: translate(-2px, 1px) rotate(-0.25deg); }
+      17% { transform: translate(3px, -2px); }
+      25% { transform: translate(-1px, 2px) rotate(0.3deg); }
+      33% { transform: translate(2px, 1px); }
+      42% { transform: translate(-3px, -1px) rotate(-0.2deg); }
+      50% { transform: translate(1px, -3px); }
+      58% { transform: translate(-2px, 2px) rotate(0.25deg); }
+      67% { transform: translate(3px, 0); }
+      75% { transform: translate(0, -2px) rotate(-0.3deg); }
+      83% { transform: translate(-2px, -1px); }
+      92% { transform: translate(2px, 2px) rotate(0.2deg); }
+    }
+    @keyframes jolt {
+      0% { transform: translate(0, 0) scale(1); }
+      15% { transform: translate(-7px, 4px) scale(1.025) rotate(-0.8deg); }
+      30% { transform: translate(6px, -5px) scale(1.02) rotate(0.6deg); }
+      50% { transform: translate(-4px, 2px) scale(1.01); }
+      75% { transform: translate(2px, -1px); }
+      100% { transform: translate(0, 0) scale(1); }
     }
 
     /* Double gold frame */
@@ -140,7 +157,7 @@
     /* Pupils slit smoothly - on the slider, and in a snap when the eyes awaken */
     .pupil { transition: rx 0.22s cubic-bezier(0.3, 1.6, 0.5, 1), ry 0.22s cubic-bezier(0.3, 1.6, 0.5, 1); }
     /* Streak confrontation awakened (proceed hovered): the beat races, the window trembles */
-    body.confront.max { animation: heartbeat 0.5s ease-out infinite, shake 0.11s steps(2) infinite; }
+    body.confront.max { animation: heartbeat 0.5s ease-out infinite, shake 0.42s steps(1) infinite, jolt 0.45s ease-out; }
 
     /* Heading */
     .kicker { font-size: 11px; letter-spacing: 0.42em; color: var(--gold); }

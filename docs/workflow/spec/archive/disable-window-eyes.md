@@ -7,8 +7,8 @@
 
 ## Dread zone (over 90 min)
 - Number: color-split slices, flicker; at 120 a one-frame "見てるよ"
-- Room: faster heartbeat, darkness closing in, scanlines; the window trembles at 120
-- Eyes (main and stars): widen, pupils slit (from 60), stop blinking, stare at the slider thumb (also while dragging)
+- Room: faster heartbeat, darkness closing in, scanlines; at the max the window jolts once, then shakes irregularly
+- Eyes (main and stars): widen, pupils slit (from 60), stop blinking; they always keep following the cursor
 - Caption escalates: 分だけ無効化 → 分も無効化 → 分も……？ → 分。本気？
 
 ## Streak confrontation

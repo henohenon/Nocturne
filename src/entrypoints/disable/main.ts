@@ -64,10 +64,11 @@ const eyeEl = document.querySelector('.eye') as SVGSVGElement;
 const irisEls = Array.from(document.querySelectorAll<SVGGElement>('.iris'));
 const pupilEls = Array.from(document.querySelectorAll<SVGEllipseElement>('.pupil'));
 
-/** Last cursor position; the eyes look here unless they stare at the slider */
+/** Last cursor position; every eye looks here */
 let pointer: readonly [number, number] = [window.innerWidth / 2, window.innerHeight / 2];
-/** True while the slider is being dragged */
-let dragging = false;
+/** Dread from the minutes slider (0-1) and how slit it makes the pupils (0-1) */
+let sliderDread = 0;
+let sliderSlit = 0;
 /** True while the proceed button of the streak confrontation is hovered or focused - every eye awakens */
 let awake = false;
 
@@ -87,7 +88,7 @@ function confront(count: number): Promise<boolean> {
   formView.hidden = true;
   confrontView.hidden = false;
   document.body.classList.add('confront');
-  applyDread(0, 0);
+  refreshDread();
   walkBtn.focus();
 
   let remaining = streakWaitSec(count);
@@ -121,31 +122,29 @@ function confront(count: number): Promise<boolean> {
 }
 
 /**
- * Screen position of the slider thumb
- */
-function thumbPosition(): readonly [number, number] {
-  const rect = minutesInput.getBoundingClientRect();
-  const fill = (Number(minutesInput.value) - DISABLE_STEP_MIN) / (DISABLE_MAX_MIN - DISABLE_STEP_MIN);
-  return [rect.left + 7 + fill * (rect.width - 14), rect.top + rect.height / 2];
-}
-
-/**
  * Awaken every eye while the proceed button is hovered or focused (the locked button too); calm again otherwise
  */
 function updateAwake(): void {
   const next = !confrontView.hidden && (proceedBtn.matches(':hover') || proceedBtn.matches(':focus-visible'));
   if (next === awake) return;
   awake = next;
-  applyDread(awake ? 1 : 0, awake ? 1 : 0);
-  look();
+  refreshDread();
 }
 
 /**
- * Point every iris, each from its own resting spot, at the cursor (also while awakened) - or at the slider thumb while it is dragged or in the dread zone
+ * One source of dread for both views: the slider on the form, the proceed button on the confrontation
+ */
+function refreshDread(): void {
+  if (awake) applyDread(1, 1);
+  else if (confrontView.hidden) applyDread(sliderDread, sliderSlit);
+  else applyDread(0, 0);
+}
+
+/**
+ * Point every iris, each from its own resting spot, at the cursor
  */
 function look(): void {
-  const staring = !formView.hidden && (dragging || Number(minutesInput.value) > DREAD_FROM_MIN);
-  const [tx, ty] = staring ? thumbPosition() : pointer;
+  const [tx, ty] = pointer;
   const ctm = eyeEl.getScreenCTM();
   if (!ctm) return;
   for (const iris of irisEls) {
@@ -200,19 +199,18 @@ function renderDuration(): void {
   const color = durationColor(minutes);
   const glow = minutes > DREAD_FROM_MIN ? DREAD_GLOW : color;
   const fill = (minutes - DISABLE_STEP_MIN) / (DISABLE_MAX_MIN - DISABLE_STEP_MIN);
-  const dread = Math.max(0, (minutes - DREAD_FROM_MIN) / (DISABLE_MAX_MIN - DREAD_FROM_MIN));
-  const slit = Math.max(0, (minutes - SLIT_FROM_MIN) / (DISABLE_MAX_MIN - SLIT_FROM_MIN));
+  sliderDread = Math.max(0, (minutes - DREAD_FROM_MIN) / (DISABLE_MAX_MIN - DREAD_FROM_MIN));
+  sliderSlit = Math.max(0, (minutes - SLIT_FROM_MIN) / (DISABLE_MAX_MIN - SLIT_FROM_MIN));
   const body = document.body;
   body.style.setProperty('--c', `rgb(${color.join(' ')})`);
   body.style.setProperty('--g', `rgb(${glow.join(' ')})`);
   body.style.setProperty('--t', String(minutes / DISABLE_MAX_MIN));
   body.style.setProperty('--p', `${fill * 100}%`);
   body.style.setProperty('--beat', `${BEAT_BASE_SEC - BEAT_SPEEDUP_SEC * (minutes / DISABLE_MAX_MIN)}s`);
-  applyDread(dread, slit);
+  refreshDread();
   minutesValue.textContent = String(minutes);
   minutesValue.dataset.text = String(minutes);
   minutesCaption.textContent = DURATION_CAPTIONS.find(([upTo]) => minutes <= upTo)?.[1] ?? '';
-  look();
 }
 
 /**
@@ -252,8 +250,6 @@ minutesInput.max = String(DISABLE_MAX_MIN);
 minutesInput.step = String(DISABLE_STEP_MIN);
 minutesInput.value = String(DISABLE_DEFAULT_MIN);
 minutesInput.addEventListener('input', renderDuration);
-minutesInput.addEventListener('pointerdown', () => { dragging = true; look(); });
-window.addEventListener('pointerup', () => { dragging = false; look(); });
 renderDuration();
 
 disableBtn.addEventListener('click', () => {

@@ -5,7 +5,7 @@
 - **Stars blink by scaling the red dot to zero height** — cheap and reads as a blink at this size
 - **Dread state lives on `<body>`** (`--k`, `--wide`, `--beat`, classes `dread` / `flicker` / `max`); CSS does the effects, script only sets values and pupil shapes
 - **Stop blinking by re-declaring the animation list without the blink** — keeping the finished open animation by name leaves the lid open (pausing could freeze it mid-blink)
-- **Stare at the thumb only in the dread zone or while dragging** — elsewhere the eyes keep following the cursor
+- **One source of dread** — the slider (form) or the proceed button (confrontation) feeds the same state; the eyes always follow the cursor (staring at the slider thumb was tried and dropped)
 - **Top color = bright crimson** (not blood black): the danger is carried by the effects, the number stays readable
 
 ## Process
