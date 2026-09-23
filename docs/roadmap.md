@@ -35,11 +35,17 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - [x] 代替手法（CSS `:has()` / 要素データ / 他）の比較
 - [x] research ノートにまとめる
 
-## 隠す機能を CSS `:has()` 方式で再実装
+## 隠す機能を CSS `:has()` 方式で再実装 ✅
 - [x] 設計（business / spec / archi）
 - [x] overlay.css を `:has()` 許可リスト方式に書き換え
 - [x] JS のバッジ判定・MutationObserver を削除
 - [x] 実ページで動作確認
+
+## WXT への移行（開発時の自動リロード）
+- [x] 設計（business / spec / archi）
+- [x] WXT 導入・エントリポイント移行
+- [x] ビルド成果物の同等性確認
+- [x] 開発モード（自動リロード）確認（手元 Chrome での反映は未確認）
 
 ---
 
