@@ -12,6 +12,10 @@ export const DISABLE_MAX_MIN = 120;
 /** A disable within this gap after the previous one ended counts as consecutive */
 export const STREAK_GAP_MS = 60 * 60 * 1000;
 
+/** Streak confrontation: the proceed button unlocks after STEP × (n − 1) seconds, capped at MAX */
+export const STREAK_WAIT_STEP_SEC = 3;
+export const STREAK_WAIT_MAX_SEC = 15;
+
 /** Night schedule (local time, minutes from midnight): overlay off from start until end */
 export const SCHEDULE_START_MIN = 19 * 60 + 30;
 export const SCHEDULE_END_MIN = 5 * 60;
