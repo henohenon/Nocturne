@@ -68,6 +68,8 @@ const pupilEls = Array.from(document.querySelectorAll<SVGEllipseElement>('.pupil
 let pointer: readonly [number, number] = [window.innerWidth / 2, window.innerHeight / 2];
 /** True while the slider is being dragged */
 let dragging = false;
+/** True while the proceed button of the streak confrontation is hovered or focused - every eye awakens */
+let awake = false;
 
 /**
  * Seconds the proceed button stays locked for the given streak count
@@ -81,10 +83,11 @@ function streakWaitSec(count: number): number {
  */
 function confront(count: number): Promise<boolean> {
   streakCountEl.textContent = String(count);
+  streakCountEl.dataset.text = String(count);
   formView.hidden = true;
   confrontView.hidden = false;
   document.body.classList.add('confront');
-  document.body.classList.remove('max');
+  applyDread(0, 0);
   walkBtn.focus();
 
   let remaining = streakWaitSec(count);
@@ -127,11 +130,30 @@ function thumbPosition(): readonly [number, number] {
 }
 
 /**
+ * Screen position of an element's center
+ */
+function centerOf(el: Element): readonly [number, number] {
+  const rect = el.getBoundingClientRect();
+  return [rect.left + rect.width / 2, rect.top + rect.height / 2];
+}
+
+/**
+ * Awaken every eye while the proceed button is hovered or focused (the locked button too); calm again otherwise
+ */
+function updateAwake(): void {
+  const next = !confrontView.hidden && (proceedBtn.matches(':hover') || proceedBtn.matches(':focus-visible'));
+  if (next === awake) return;
+  awake = next;
+  applyDread(awake ? 1 : 0, awake ? 1 : 0);
+  look();
+}
+
+/**
  * Point every iris, each from its own resting spot, at the cursor - or at the slider thumb while it is dragged or in the dread zone
  */
 function look(): void {
   const staring = !formView.hidden && (dragging || Number(minutesInput.value) > DREAD_FROM_MIN);
-  const [tx, ty] = staring ? thumbPosition() : pointer;
+  const [tx, ty] = awake ? centerOf(proceedBtn) : staring ? thumbPosition() : pointer;
   const ctm = eyeEl.getScreenCTM();
   if (!ctm) return;
   for (const iris of irisEls) {
@@ -161,6 +183,24 @@ function durationColor(minutes: number): readonly [number, number, number] {
 }
 
 /**
+ * Set how deep into dread the room is and how slit the pupils are (both 0-1)
+ */
+function applyDread(dread: number, slit: number): void {
+  const body = document.body;
+  body.style.setProperty('--k', String(dread));
+  body.style.setProperty('--wide', String(1 + DREAD_WIDEN * dread));
+  body.classList.toggle('dread', dread > 0);
+  body.classList.toggle('flicker', dread > FLICKER_FROM_K);
+  body.classList.toggle('max', dread >= 1);
+  for (const pupil of pupilEls) {
+    const r = Number(pupil.dataset.r);
+    const [rxAtSlit, ryAtSlit] = (pupil.dataset.slit ?? '1 1').split(' ').map(Number) as [number, number];
+    pupil.style.setProperty('rx', `${(r * (1 + (rxAtSlit - 1) * slit)).toFixed(2)}px`);
+    pupil.style.setProperty('ry', `${(r * (1 + (ryAtSlit - 1) * slit)).toFixed(2)}px`);
+  }
+}
+
+/**
  * Show the slider's minutes: one color for number, fill and thumb; past the dread line the number breaks and the room closes in
  */
 function renderDuration(): void {
@@ -175,18 +215,8 @@ function renderDuration(): void {
   body.style.setProperty('--g', `rgb(${glow.join(' ')})`);
   body.style.setProperty('--t', String(minutes / DISABLE_MAX_MIN));
   body.style.setProperty('--p', `${fill * 100}%`);
-  body.style.setProperty('--k', String(dread));
-  body.style.setProperty('--wide', String(1 + DREAD_WIDEN * dread));
   body.style.setProperty('--beat', `${BEAT_BASE_SEC - BEAT_SPEEDUP_SEC * (minutes / DISABLE_MAX_MIN)}s`);
-  body.classList.toggle('dread', dread > 0);
-  body.classList.toggle('flicker', dread > FLICKER_FROM_K);
-  body.classList.toggle('max', minutes >= DISABLE_MAX_MIN);
-  for (const pupil of pupilEls) {
-    const r = Number(pupil.dataset.r);
-    const [rxAtSlit, ryAtSlit] = (pupil.dataset.slit ?? '1 1').split(' ').map(Number) as [number, number];
-    pupil.setAttribute('rx', (r * (1 + (rxAtSlit - 1) * slit)).toFixed(2));
-    pupil.setAttribute('ry', (r * (1 + (ryAtSlit - 1) * slit)).toFixed(2));
-  }
+  applyDread(dread, slit);
   minutesValue.textContent = String(minutes);
   minutesValue.dataset.text = String(minutes);
   minutesCaption.textContent = DURATION_CAPTIONS.find(([upTo]) => minutes <= upTo)?.[1] ?? '';
@@ -244,7 +274,11 @@ disableBtn.addEventListener('click', () => {
 cancelBtn.addEventListener('click', () => window.close());
 document.addEventListener('mousemove', (event) => {
   pointer = [event.clientX, event.clientY];
+  updateAwake();
   look();
 });
+document.addEventListener('mouseleave', updateAwake);
+proceedBtn.addEventListener('focus', updateAwake);
+proceedBtn.addEventListener('blur', updateAwake);
 
 checkAvailability();

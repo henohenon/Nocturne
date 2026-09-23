@@ -135,6 +135,10 @@
     body.dread .lid-band { animation: band-open 1s cubic-bezier(0.3, 0.7, 0.2, 1) 0.45s both, redden 1.1s ease-in-out 0.2s both; }
     body.dread .dot-lid { animation: dot-open 1s cubic-bezier(0.3, 0.7, 0.2, 1) 0.45s both; }
     body.confront .eye { width: 150px; height: 140px; }
+    /* Pupils slit smoothly - on the slider, and in a snap when the eyes awaken */
+    .pupil { transition: rx 0.22s cubic-bezier(0.3, 1.6, 0.5, 1), ry 0.22s cubic-bezier(0.3, 1.6, 0.5, 1); }
+    /* Streak confrontation awakened (proceed hovered): the beat races, the window trembles */
+    body.confront.max { animation: heartbeat 0.5s ease-out infinite, shake 0.11s steps(2) infinite; }
 
     /* Heading */
     .kicker { font-size: 11px; letter-spacing: 0.42em; color: var(--gold); }
@@ -351,7 +355,7 @@
   </section>
 
   <section id="confront" class="view" hidden>
-    <p class="count">これで<strong id="streak-count">2</strong>回連続です。</p>
+    <p class="count">これで<strong id="streak-count" class="num" data-text="2">2</strong>回連続です。</p>
     <p class="ask">本当に必要ですか？？？</p>
     <p class="walk">もし虚ろならば、今すぐ散歩に行きましょう。</p>
     <div class="buttons">

@@ -11,5 +11,8 @@
 - Eyes (main and stars): widen, pupils slit (from 60), stop blinking, stare at the slider thumb (also while dragging)
 - Caption escalates: 分だけ無効化 → 分も無効化 → 分も……？ → 分。本気？
 
+## Streak confrontation
+- Starts calm whatever the minutes; hovering or focusing "それでも解く" (locked or not) awakens it: full dread, eyes stare at the button; leaving calms it
+
 ## Toolbar icon
 - Stars as black discs with red dots (32px / 16px: hand-placed red pixels)
