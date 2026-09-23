@@ -66,6 +66,11 @@ export function isNightSealed(record: DisableRecord, nowMs: number): boolean {
   return record.nightSealUntil > nowMs;
 }
 
+/** Whether the user broke the seal by hand (manual disable in effect outside the night schedule) */
+export function isSealBroken(record: DisableRecord, now: Date): boolean {
+  return !isInSchedule(now) && isManuallyDisabled(record, now.getTime());
+}
+
 /** Whether the overlay should currently be applied */
 export function isOverlayActive(record: DisableRecord, now: Date): boolean {
   if (isInSchedule(now)) return isNightSealed(record, now.getTime());

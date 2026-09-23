@@ -12,6 +12,7 @@ Chrome extension that blocks distracting feeds (YouTube recommendations, X timel
 ## Key Paths
 - `src/entrypoints/youtube.content.ts`, `x.content.ts` — per-site content scripts
 - `src/overlay.ts` — shared seal lifecycle (inject/remove styles, follow shared state)
+- `src/entrypoints/background.ts` — toolbar icon (open eye while the seal is broken by hand)
 - `src/state.ts`, `src/config.ts` — shared state and constants
 - `src/entrypoints/popup/`, `disable/` — extension popup, disable window
 - `src/styles/youtube.css`, `x.css` — per-site seal styles

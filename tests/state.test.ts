@@ -11,6 +11,7 @@ import {
   enableNow,
   isInSchedule,
   isOverlayActive,
+  isSealBroken,
   loadRecord,
   nextStreakCount,
   scheduleEnd,
@@ -131,5 +132,26 @@ describe('night seal', () => {
     store[RECORD_STORAGE_KEY] = { nightSealUntil: 123 };
     await disableFor(5);
     expect((await loadRecord()).nightSealUntil).toBe(123);
+  });
+});
+
+describe('seal broken (toolbar icon)', () => {
+  test('open eye only for a manual disable outside the night', async () => {
+    at('2026-09-23T14:00:00');
+    expect(isSealBroken(await loadRecord(), new Date())).toBe(false);
+    await disableFor(10);
+    const record = await loadRecord();
+    expect(isSealBroken(record, new Date())).toBe(true);
+    at('2026-09-23T14:10:01');
+    expect(isSealBroken(record, new Date())).toBe(false);
+  });
+
+  test('closed eye once the night starts, even mid-disable', async () => {
+    at('2026-09-23T19:20:00');
+    await disableFor(30);
+    const record = await loadRecord();
+    expect(isSealBroken(record, new Date())).toBe(true);
+    at('2026-09-23T19:31:00');
+    expect(isSealBroken(record, new Date())).toBe(false);
   });
 });
