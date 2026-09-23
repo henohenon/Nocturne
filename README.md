@@ -1,22 +1,22 @@
+<p align="center"><img src="public/icons/icon128.png" width="96" alt=""></p>
+
 # Nocturne
 
-A checkpoint against distracting feeds. Nocturne seals YouTube recommendations and the X timeline by default, makes breaking the seal a deliberate act, and steps aside at night.
+A Chrome extension that seals the feeds that eat your time — YouTube recommendations and the X timeline — behind a deliberate checkpoint. Free at night.
 
-## What it does
+## Features
 
-- **YouTube** — thumbnails, titles, and clicks on recommended videos are hidden (watch sidebar, grids, Shorts). Videos from official artist channels (not live), playlists, and mixes stay usable
-- **X** — the home timeline and Explore are sealed, and the trends / who-to-follow sidebar is hidden. Notifications, messages, profiles, individual posts, and posting stay free
-- **Night mode** — off automatically from 19:30 to 05:00, with a one-tap toggle to keep the seal on for the night
-- **Deliberate disable** — breaking the seal opens a dedicated window (default 30 min, max 120). Doing it again within 60 minutes brings up a confrontation whose proceed button stays locked longer each time
-- **Shared everywhere** — the seal state applies to every YouTube and X tab
+- **YouTube** — recommended videos are blanked out. Official artist videos, playlists, and mixes still work
+- **X** — the home timeline, Explore, and sidebar trends are sealed. Notifications, DMs, profiles, posts, and posting still work
+- **Night** — off from 19:30 to 05:00, or keep the seal on for the night from the popup
+- **Breaking the seal** — takes a dedicated window; doing it again soon makes you wait longer each time
 
-## Install (from a release)
+## Install
 
-1. Download `nocturne-<version>-chrome.zip` from [Releases](../../releases) and unzip it
-2. Open `chrome://extensions` and turn on **Developer mode**
-3. **Load unpacked** → select the unzipped folder
+1. Download the zip from [Releases](../../releases) and unzip it
+2. Open `chrome://extensions`, turn on **Developer mode**, then **Load unpacked** and pick the folder
 
-To update, replace the folder contents with a newer release and press ↻ on the extension card.
+To update, replace the folder with a newer release and press ↻ on the extension card.
 
 ## Development
 
@@ -24,30 +24,19 @@ Requires [bun](https://bun.sh).
 
 ```bash
 bun install
-bun run dev        # dev build with auto-reload → load dist/chrome-mv3-dev once
-bun run build      # production build → dist/chrome-mv3
-bun run zip        # release zip → dist/nocturne-<version>-chrome.zip
+bun run dev         # auto-reloading dev build → load dist/chrome-mv3-dev
+bun run build       # production build → dist/chrome-mv3
+bun run test        # unit tests
 bun run type-check
-bun run test       # unit tests (shared state)
 ```
 
-Keep only one of the dev / production builds enabled at a time — they are separate extensions with separate state.
+Enable only one of the dev / production builds at a time; they keep separate state.
 
-## Branching and releasing
-
-`main` is always releasable. Small changes go straight to `main`; larger work uses a short-lived `feat/*` or `fix/*` branch merged via PR. Versions follow SemVer (patch: fixes and selector updates, minor: features and UI, major: breaking changes). Full policy: [`.claude/rules/git.md`](.claude/rules/git.md).
-
-To release, bump `version` in `package.json`, commit, then push a matching tag:
-
-```bash
-git tag v1.0.1 && git push origin v1.0.1
-```
-
-GitHub Actions builds the zip and publishes a release.
+To release, bump `version` in `package.json` and push a matching `vX.Y.Z` tag — CI publishes the zip. Branching and versioning: [`.claude/rules/git.md`](.claude/rules/git.md).
 
 ## Notes
 
-- Relies on YouTube's and X's current DOM; site changes can break blocking until selectors are updated (`src/styles/youtube.css`, `src/styles/x.css`)
-- Official artist detection uses the icon's accessible label and supports Japanese and English UI only
-- No data leaves your browser; state is kept in extension local storage
-- Not affiliated with YouTube or Google
+- Depends on YouTube's and X's current page structure; site changes can break it until the selectors in `src/styles/` are updated
+- Official artist detection supports Japanese and English YouTube UI only
+- Everything stays in your browser (extension local storage)
+- Not affiliated with Google, YouTube, or X Corp.
