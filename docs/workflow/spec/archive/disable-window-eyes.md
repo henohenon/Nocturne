@@ -14,5 +14,9 @@
 ## Streak confrontation
 - Starts calm whatever the minutes; hovering or focusing "それでも解く" (locked or not) awakens it: full dread, the eyes keep following the cursor; leaving calms it
 
+## Popup
+- While the seal is broken the mark opens red and the wordmark turns crimson (same rule as the toolbar icon)
+- Hovering or focusing "今すぐ再有効化" closes the eye back to the gold mark — a preview of the seal
+
 ## Toolbar icon
 - Stars as black discs with red dots (32px / 16px: hand-placed red pixels)

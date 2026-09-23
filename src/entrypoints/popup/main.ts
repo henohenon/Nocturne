@@ -80,6 +80,8 @@ async function render(): Promise<void> {
     actionBtn.textContent = '無効化…';
     actionBtn.className = 'danger';
   }
+  // The mark opens red while the seal is broken (same rule as the toolbar icon)
+  document.body.classList.toggle('broken', mode === 'disabled');
 }
 
 /**
