@@ -48,6 +48,8 @@
     }
     /* At the maximum the whole window trembles */
     body.max { animation: heartbeat var(--beat, 1.6s) ease-out infinite, shake 0.11s steps(2) infinite; }
+    /* The shake nudges the page 1px past the window; hide the scrollbar it would bring (only while shaking) */
+    html:has(body.max) { overflow: hidden; }
     @keyframes shake {
       0% { transform: translate(0, 0); }
       50% { transform: translate(1px, -1px); }
