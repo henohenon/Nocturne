@@ -3,7 +3,13 @@
  * Deliberate, dread-themed step before a manual disable; confronts consecutive disables with a timed lock
  */
 
-import { DISABLE_DEFAULT_MIN, STREAK_WAIT_MAX_SEC, STREAK_WAIT_STEP_SEC } from '../../config';
+import {
+  DISABLE_DEFAULT_MIN,
+  DISABLE_MAX_MIN,
+  DISABLE_STEP_MIN,
+  STREAK_WAIT_MAX_SEC,
+  STREAK_WAIT_STEP_SEC,
+} from '../../config';
 import {
   clampMinutes,
   disableFor,
@@ -13,12 +19,25 @@ import {
   nextStreakCount,
 } from '../../state';
 
-/** How far the iris may travel from center (SVG units) */
-const IRIS_MAX_OFFSET = 7;
-/** Cursor distance (px) at which the iris reaches its max offset */
+/** Cursor distance (px) at which each iris reaches its max offset (its data-reach, SVG units) */
 const IRIS_FULL_REACH_PX = 220;
 
+/** Slider color by minutes: white -> gold -> red -> blood black */
+const DURATION_COLOR_STOPS: ReadonlyArray<readonly [number, readonly [number, number, number]]> = [
+  [0, [244, 239, 228]],
+  [30, [188, 145, 47]],
+  [90, [255, 42, 61]],
+  [120, [110, 0, 22]],
+];
+/** Past this, the color is too dark to glow in itself; glow in bright red instead */
+const DURATION_GLOW_SWITCH_MIN = 90;
+const DURATION_GLOW_DARK: readonly [number, number, number] = [255, 42, 61];
+/** Past this, the number trembles */
+const DURATION_DREAD_MIN = 100;
+
 const minutesInput = document.getElementById('minutes') as HTMLInputElement;
+const minutesView = document.getElementById('minutes-view')!;
+const minutesValue = document.getElementById('minutes-value')!;
 const disableBtn = document.getElementById('disable') as HTMLButtonElement;
 const cancelBtn = document.getElementById('cancel') as HTMLButtonElement;
 const noticeEl = document.getElementById('notice')!;
@@ -28,7 +47,7 @@ const streakCountEl = document.getElementById('streak-count')!;
 const walkBtn = document.getElementById('walk') as HTMLButtonElement;
 const proceedBtn = document.getElementById('proceed') as HTMLButtonElement;
 const eyeEl = document.querySelector('.eye') as SVGSVGElement;
-const irisEl = document.getElementById('iris')!;
+const irisEls = Array.from(document.querySelectorAll<SVGGElement>('.iris'));
 
 /**
  * Seconds the proceed button stays locked for the given streak count
@@ -78,7 +97,7 @@ function confront(count: number): Promise<boolean> {
 }
 
 /**
- * Point the iris toward the cursor
+ * Point every iris toward the cursor
  */
 function followCursor(event: MouseEvent): void {
   const rect = eyeEl.getBoundingClientRect();
@@ -86,8 +105,44 @@ function followCursor(event: MouseEvent): void {
   const dy = event.clientY - (rect.top + rect.height * 0.42);
   const distance = Math.hypot(dx, dy);
   if (distance === 0) return;
-  const reach = Math.min(distance / IRIS_FULL_REACH_PX, 1) * IRIS_MAX_OFFSET;
-  irisEl.setAttribute('transform', `translate(${((dx / distance) * reach).toFixed(2)} ${((dy / distance) * reach).toFixed(2)})`);
+  const pull = Math.min(distance / IRIS_FULL_REACH_PX, 1) / distance;
+  for (const iris of irisEls) {
+    const reach = Number(iris.dataset.reach) * pull;
+    iris.setAttribute('transform', `translate(${(dx * reach).toFixed(2)} ${(dy * reach).toFixed(2)})`);
+  }
+}
+
+/**
+ * Slider color at the given minutes, interpolated between the stops
+ */
+function durationColor(minutes: number): readonly [number, number, number] {
+  let [fromMin, from] = DURATION_COLOR_STOPS[0]!;
+  for (const [toMin, to] of DURATION_COLOR_STOPS) {
+    if (minutes <= toMin) {
+      const t = toMin === fromMin ? 1 : (minutes - fromMin) / (toMin - fromMin);
+      return [0, 1, 2].map((c) => Math.round(from[c]! + (to[c]! - from[c]!) * t)) as [number, number, number];
+    }
+    [fromMin, from] = [toMin, to];
+  }
+  return from;
+}
+
+/**
+ * Show the slider's minutes and paint number, fill and thumb in its color
+ */
+function renderDuration(): void {
+  const minutes = Number(minutesInput.value);
+  const color = durationColor(minutes);
+  const glow = minutes > DURATION_GLOW_SWITCH_MIN ? DURATION_GLOW_DARK : color;
+  const fill = (minutes - DISABLE_STEP_MIN) / (DISABLE_MAX_MIN - DISABLE_STEP_MIN);
+  for (const el of [minutesInput, minutesView]) {
+    el.style.setProperty('--c', `rgb(${color.join(' ')})`);
+    el.style.setProperty('--g', `rgb(${glow.join(' ')})`);
+    el.style.setProperty('--t', String(minutes / DISABLE_MAX_MIN));
+    el.style.setProperty('--p', `${fill * 100}%`);
+  }
+  minutesView.classList.toggle('dread', minutes > DURATION_DREAD_MIN);
+  minutesValue.textContent = String(minutes);
 }
 
 /**
@@ -110,7 +165,6 @@ async function checkAvailability(): Promise<void> {
  */
 async function handleDisable(): Promise<void> {
   const minutes = clampMinutes(Number(minutesInput.value));
-  minutesInput.value = String(minutes);
 
   const record = await loadRecord();
   const count = nextStreakCount(record, Date.now());
@@ -123,10 +177,12 @@ async function handleDisable(): Promise<void> {
   window.close();
 }
 
+minutesInput.min = String(DISABLE_STEP_MIN);
+minutesInput.max = String(DISABLE_MAX_MIN);
+minutesInput.step = String(DISABLE_STEP_MIN);
 minutesInput.value = String(DISABLE_DEFAULT_MIN);
-minutesInput.addEventListener('change', () => {
-  minutesInput.value = String(clampMinutes(Number(minutesInput.value)));
-});
+minutesInput.addEventListener('input', renderDuration);
+renderDuration();
 
 disableBtn.addEventListener('click', () => {
   disableBtn.disabled = true;

@@ -8,6 +8,8 @@ export const LEGACY_STORAGE_KEYS = ['cooldownEndTime', 'disableDurationMin'];
 export const DISABLE_DEFAULT_MIN = 30;
 export const DISABLE_MIN_MIN = 1;
 export const DISABLE_MAX_MIN = 120;
+/** Slider step in the disable window (also its minimum) */
+export const DISABLE_STEP_MIN = 5;
 
 /** A disable within this gap after the previous one ended counts as consecutive */
 export const STREAK_GAP_MS = 60 * 60 * 1000;

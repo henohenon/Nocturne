@@ -17,7 +17,7 @@ import {
 
 const RENDER_INTERVAL_MS = 500;
 const DISABLE_WINDOW_WIDTH = 440;
-const DISABLE_WINDOW_HEIGHT = 560;
+const DISABLE_WINDOW_HEIGHT = 640;
 
 const statusEl = document.getElementById('status')!;
 const noteEl = document.getElementById('note')!;
