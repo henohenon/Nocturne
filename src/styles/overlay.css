@@ -1,63 +1,49 @@
-/* YouTube Overlay - Lightweight and Granular Hiding */
+/* YouTube Overlay - Block recommendation items unless allowlisted */
 
 :root {
   --yt-overlay-hidden-bg: #404040;
 }
 
-/* Container - disable interactions by default */
-:is(ytd-rich-item-renderer, yt-lockup-view-model, ytd-reel-video-renderer) {
+/*
+ * Blocked items
+ * Targets: video item, Shorts item, Shorts player item, home grid wrapper
+ * Allowlist (:has): live badge (metadata / thumbnail), mix/playlist stacked thumbnail
+ */
+:is(
+  yt-lockup-view-model,
+  ytm-shorts-lockup-view-model,
+  ytd-reel-video-renderer,
+  ytd-rich-item-renderer
+):not(:has(
+  .ytBadgeShapeLive,
+  .ytBadgeShapeThumbnailLive,
+  .ytCollectionThumbnailViewModelHost
+)) {
   pointer-events: none !important;
   cursor: default !important;
+
+  /* Thumbnails and channel images - solid gray */
+  & :is(.ytThumbnailViewModelImage, .ytDecoratedAvatarViewModelHost) {
+    background-color: var(--yt-overlay-hidden-bg) !important;
+  }
+
+  & :is(.ytThumbnailViewModelImage, .ytDecoratedAvatarViewModelHost) img {
+    opacity: 0 !important;
+  }
+
+  /* Thumbnail badges (duration, "new", etc.) - hide completely */
+  & :is(.ytThumbnailBottomOverlayViewModelHost, .ytBadgeViewModelHost) {
+    display: none !important;
+  }
+
+  /* Text - same color as background (invisible but present) */
+  & :is(.ytAttributedStringHost, .ytAttributedStringHost *) {
+    color: var(--yt-overlay-hidden-bg) !important;
+    background-color: var(--yt-overlay-hidden-bg) !important;
+  }
 }
 
-/* Thumbnails and channel images - solid gray */
-:is(ytd-rich-item-renderer, yt-lockup-view-model) :is(.ytThumbnailViewModelImage, .ytDecoratedAvatarViewModelHost),
-ytd-reel-video-renderer .ytThumbnailViewModelImage {
-  background-color: var(--yt-overlay-hidden-bg) !important;
-}
-
-:is(ytd-rich-item-renderer, yt-lockup-view-model) :is(.ytThumbnailViewModelImage, .ytDecoratedAvatarViewModelHost) img,
-ytd-reel-video-renderer .ytThumbnailViewModelImage img {
-  opacity: 0 !important;
-}
-
-/* Badges and overlays - hide completely */
-:is(ytd-rich-item-renderer, yt-lockup-view-model) .ytThumbnailBottomOverlayViewModelHost {
-  display: none !important;
-}
-
-/* Text - same color as background (invisible but present) */
-:is(ytd-rich-item-renderer, yt-lockup-view-model) .yt-core-attributed-string {
-  color: var(--yt-overlay-hidden-bg) !important;
-  background-color: var(--yt-overlay-hidden-bg) !important;
-}
-
-/* Exception: Items with .show class are fully visible and interactive */
-:is(ytd-rich-item-renderer, yt-lockup-view-model, ytd-reel-video-renderer).show {
-  pointer-events: auto !important;
-  cursor: pointer !important;
-}
-
-:is(ytd-rich-item-renderer, yt-lockup-view-model).show :is(.ytThumbnailViewModelImage, .ytDecoratedAvatarViewModelHost),
-ytd-reel-video-renderer.show .ytThumbnailViewModelImage {
-  background-color: transparent !important;
-}
-
-:is(ytd-rich-item-renderer, yt-lockup-view-model).show :is(.ytThumbnailViewModelImage, .ytDecoratedAvatarViewModelHost) img,
-ytd-reel-video-renderer.show .ytThumbnailViewModelImage img {
-  opacity: 1 !important;
-}
-
-:is(ytd-rich-item-renderer, yt-lockup-view-model).show .ytThumbnailBottomOverlayViewModelHost {
-  display: block !important;
-}
-
-:is(ytd-rich-item-renderer, yt-lockup-view-model).show .yt-core-attributed-string {
-  color: inherit !important;
-  background-color: transparent !important;
-}
-
-/* End screens - completely hide */
-:is(.ytp-endscreen-content, .ytp-ce-element, .ytp-cards-teaser, .ytp-videowall-still) {
+/* Player - end screen, cards, fullscreen related grid - hide completely */
+:is(.ytp-endscreen-content, .ytp-ce-element, .ytp-cards-teaser, .ytp-modern-videowall-still) {
   display: none !important;
 }

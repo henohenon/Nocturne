@@ -13,8 +13,8 @@ Conventions derived from the existing codebase. Follow these when reading or wri
 
 ## CSS
 
-- **Selectors**: YouTube custom element names only (`ytd-*`, `yt-*`); no generic HTML tags
-- **Visibility pattern**: default = hidden/blocked; `.show` class = fully visible and interactive
+- **Selectors**: YouTube custom element names (`ytd-*`, `yt-*`, `ytm-*`) and their view-model classes; no generic HTML tags as targets
+- **Visibility pattern**: default = hidden/blocked; allowlist via `:not(:has(...))` in CSS, written once (nesting) — no JS-side judgment
 - **`!important`**: required throughout — content scripts must override YouTube's inline styles
 - **Grouping**: related selectors on separate lines; section header comment before each group
 
