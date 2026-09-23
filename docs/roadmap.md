@@ -30,10 +30,16 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - [x] content script の実ページ動作確認（NG: バッジ判定・テキスト隠蔽）
 - [x] popup の状態遷移確認
 
-## 最新 YouTube DOM 調査・代替手法探索
+## 最新 YouTube DOM 調査・代替手法探索 ✅
 - [x] ページ種別ごとの動画要素と判定シグナルの調査
 - [x] 代替手法（CSS `:has()` / 要素データ / 他）の比較
 - [x] research ノートにまとめる
+
+## 隠す機能を CSS `:has()` 方式で再実装
+- [x] 設計（business / spec / archi）
+- [x] overlay.css を `:has()` 許可リスト方式に書き換え
+- [x] JS のバッジ判定・MutationObserver を削除
+- [x] 実ページで動作確認
 
 ---
 

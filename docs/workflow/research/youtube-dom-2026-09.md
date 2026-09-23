@@ -18,7 +18,8 @@ Investigation of the current YouTube desktop DOM to find replacements for broken
 | Signal | Meaning | Usable? |
 |---|---|---|
 | `.ytBadgeShapeIcon` | Any badge with an icon (verified, product count, duration, live, mix) | No — too broad |
-| `.ytBadgeShapeLive` | Live stream | Yes |
+| `.ytBadgeShapeLive` | Live stream (metadata badge, e.g. search) | Yes |
+| `.ytBadgeShapeThumbnailLive` | Live stream (thumbnail badge, e.g. watch sidebar lockups) | Yes |
 | `.ytCollectionThumbnailViewModelHost` | Mix / playlist (stacked thumbnail) | Yes |
 | Badge text (`ミックスリスト`, `ライブ`) | Kind label | Fallback only — locale dependent |
 | `[class*=StyleTypeVerifiedArtist]` | Official artist channel | Only on `ytd-video-renderer`; lockups hide it behind a dialog |
