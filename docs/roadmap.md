@@ -24,11 +24,16 @@ YouTube動画操作無効化Chrome拡張機能の開発ロードマップ
 - [x] 選択値を chrome.storage.local に保存
 - [x] DISABLE メッセージで duration を content script に渡す
 
-## 最新ビルドの動作確認
+## 最新ビルドの動作確認 ✅
 - [x] type-check / build
 - [x] dist 成果物の確認
 - [x] content script の実ページ動作確認（NG: バッジ判定・テキスト隠蔽）
 - [x] popup の状態遷移確認
+
+## 最新 YouTube DOM 調査・代替手法探索
+- [x] ページ種別ごとの動画要素と判定シグナルの調査
+- [x] 代替手法（CSS `:has()` / 要素データ / 他）の比較
+- [x] research ノートにまとめる
 
 ---
 
