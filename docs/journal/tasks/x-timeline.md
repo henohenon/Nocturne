@@ -36,4 +36,4 @@
 
 ## 次のアクション
 - ログイン状態の実機（ホーム・話題）での確認
-- リリース（v1.2.0）はユーザー確認後
+- v1.2.0 をリリース済み: https://github.com/henohenon/Nocturne/releases/tag/v1.2.0
