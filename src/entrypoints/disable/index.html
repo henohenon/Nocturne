@@ -305,6 +305,8 @@
     <defs>
       <mask id="lid-mask"><rect x="0" y="-4" width="128" height="124" fill="white"/><circle cx="64" cy="36" r="40" fill="black"/></mask>
       <clipPath id="opening"><path class="lid"/></clipPath>
+      <clipPath id="star-a"><circle cx="100" cy="26" r="6"/></clipPath>
+      <clipPath id="star-b"><circle cx="84" cy="16" r="4"/></clipPath>
     </defs>
     <g class="widen"><g class="lids">
       <path class="lid" fill="#1a070b"/>
@@ -319,15 +321,15 @@
     <!-- Stars of the mark: black discs, each with a red dot that watches on its own -->
     <g class="star">
       <circle class="disc" cx="100" cy="26" r="6" style="--r0: 4.4px; --r1: 6px"/>
-      <g class="iris" data-cx="100" data-cy="26" data-reach="3"><g class="dot-lid" style="--period: 5.3s; --after: 2.1s">
-        <ellipse class="pupil" cx="100" cy="26" rx="1.92" ry="1.92" data-r="1.92" data-slit="0.4 2.4" fill="#ff2a3d"/>
-      </g></g>
+      <g clip-path="url(#star-a)"><g class="iris" data-cx="100" data-cy="26" data-reach="3"><g class="dot-lid" style="--period: 5.3s; --after: 2.1s">
+        <ellipse class="pupil" cx="100" cy="26" rx="1.92" ry="1.92" data-r="1.92" data-slit="0.45 1.7" fill="#ff2a3d"/>
+      </g></g></g>
     </g>
     <g class="star">
       <circle class="disc" cx="84" cy="16" r="4" style="--r0: 2.75px; --r1: 4px"/>
-      <g class="iris" data-cx="84" data-cy="16" data-reach="2"><g class="dot-lid" style="--period: 8.9s; --after: 4.4s">
-        <ellipse class="pupil" cx="84" cy="16" rx="1.28" ry="1.28" data-r="1.28" data-slit="0.4 2.4" fill="#ff2a3d"/>
-      </g></g>
+      <g clip-path="url(#star-b)"><g class="iris" data-cx="84" data-cy="16" data-reach="2"><g class="dot-lid" style="--period: 8.9s; --after: 4.4s">
+        <ellipse class="pupil" cx="84" cy="16" rx="1.28" ry="1.28" data-r="1.28" data-slit="0.45 1.7" fill="#ff2a3d"/>
+      </g></g></g>
     </g>
   </svg>
 
