@@ -1,5 +1,5 @@
 /**
- * YouTube Overlay - Content Script
+ * Nocturne - Content Script
  * Blocks recommendation items on YouTube
  * Allow/block judgment lives in overlay.css (:has allowlist: artist videos, mixes)
  * On/off follows shared state (manual disable, night schedule) in extension storage
@@ -14,20 +14,20 @@ import { isOverlayActive, loadRecord } from '../state';
  */
 function injectOverlayStyles(): void {
   try {
-    if (document.getElementById('yt-overlay-styles')) {
+    if (document.getElementById('nocturne-styles')) {
       return;
     }
 
     const styleElement = document.createElement('style');
-    styleElement.id = 'yt-overlay-styles';
+    styleElement.id = 'nocturne-styles';
     styleElement.textContent = overlayStyles;
 
     const targetElement = document.head || document.documentElement;
     targetElement.appendChild(styleElement);
 
-    console.log('[YT Overlay] Styles injected');
+    console.log('[Nocturne] Styles injected');
   } catch (error) {
-    console.error('[YT Overlay] Failed to inject styles:', error);
+    console.error('[Nocturne] Failed to inject styles:', error);
   }
 }
 
@@ -35,10 +35,10 @@ function injectOverlayStyles(): void {
  * Remove overlay styles from the page
  */
 function removeOverlayStyles(): void {
-  const el = document.getElementById('yt-overlay-styles');
+  const el = document.getElementById('nocturne-styles');
   if (!el) return;
   el.remove();
-  console.log('[YT Overlay] Styles removed');
+  console.log('[Nocturne] Styles removed');
 }
 
 /**
@@ -53,7 +53,7 @@ async function applyState(): Promise<void> {
       removeOverlayStyles();
     }
   } catch (error) {
-    console.error('[YT Overlay] Failed to apply state:', error);
+    console.error('[Nocturne] Failed to apply state:', error);
   }
 }
 
@@ -71,6 +71,6 @@ export default defineContentScript({
     });
     ctx.setInterval(applyState, REEVALUATE_INTERVAL_MS);
 
-    console.log('[YT Overlay] Initialized');
+    console.log('[Nocturne] Initialized');
   },
 });

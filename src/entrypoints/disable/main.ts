@@ -1,5 +1,5 @@
 /**
- * YouTube Overlay - Dedicated disable window
+ * Nocturne - Dedicated disable window
  * Deliberate, danger-themed step before a manual disable; asks for reflection on consecutive disables
  */
 
@@ -66,7 +66,7 @@ minutesInput.addEventListener('change', () => {
 disableBtn.addEventListener('click', () => {
   disableBtn.disabled = true;
   handleDisable().catch((error) => {
-    console.error('[YT Overlay] Disable failed:', error);
+    console.error('[Nocturne] Disable failed:', error);
     disableBtn.disabled = false;
   });
 });

@@ -1,5 +1,5 @@
 /**
- * YouTube Overlay - Extension Popup
+ * Nocturne - Extension Popup
  * Shows current state; opens the dedicated disable window or re-enables
  */
 
@@ -78,7 +78,7 @@ actionBtn.addEventListener('click', async () => {
       await openDisableWindow();
     }
   } catch (error) {
-    console.error('[YT Overlay] Popup action failed:', error);
+    console.error('[Nocturne] Popup action failed:', error);
   }
 });
 

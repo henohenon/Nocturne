@@ -1,7 +1,7 @@
-/* YouTube Overlay - Block recommendation items unless allowlisted */
+/* Nocturne - Block recommendation items unless allowlisted */
 
 :root {
-  --yt-overlay-hidden-bg: #404040;
+  --nocturne-hidden-bg: #404040;
 }
 
 /*
@@ -32,7 +32,7 @@
 
   /* Thumbnails and channel images - solid gray */
   & :is(.ytThumbnailViewModelImage, .ytDecoratedAvatarViewModelHost) {
-    background-color: var(--yt-overlay-hidden-bg) !important;
+    background-color: var(--nocturne-hidden-bg) !important;
   }
 
   & :is(.ytThumbnailViewModelImage, .ytDecoratedAvatarViewModelHost) img {
@@ -46,8 +46,8 @@
 
   /* Text - same color as background (invisible but present) */
   & :is(.ytAttributedStringHost, .ytAttributedStringHost *) {
-    color: var(--yt-overlay-hidden-bg) !important;
-    background-color: var(--yt-overlay-hidden-bg) !important;
+    color: var(--nocturne-hidden-bg) !important;
+    background-color: var(--nocturne-hidden-bg) !important;
   }
 }
 

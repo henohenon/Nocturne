@@ -1,5 +1,5 @@
 /**
- * YouTube Overlay - Shared state
+ * Nocturne - Shared state
  * Single source of truth for manual disable, streak, and night schedule
  */
 

@@ -1,5 +1,5 @@
 {
-  "name": "yt-overlay",
+  "name": "nocturne",
   "version": "1.0.0",
   "directories": {
     "doc": "docs"
@@ -14,7 +14,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "YouTube Overlay - Chrome extension to disable video interactions on YouTube",
+  "description": "Nocturne - a checkpoint against distracting feeds (YouTube)",
   "type": "module",
   "devDependencies": {
     "@types/chrome": "^0.1.37",

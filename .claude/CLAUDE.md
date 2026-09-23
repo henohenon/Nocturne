@@ -1,8 +1,8 @@
 > **First**: before any work, read `.claude/skills/pre-task/SKILL.md` and execute it.
 
-# yt-overlay
+# Nocturne
 
-Chrome extension that overlays YouTube videos to block interaction.
+Chrome extension that blocks distracting YouTube recommendations behind a deliberate checkpoint; free at night.
 
 ## Stack
 - TypeScript + WXT (Vite) + bun

@@ -8,8 +8,8 @@ export default defineConfig({
     disabled: true,
   },
   manifest: {
-    name: 'YouTube Overlay',
-    description: 'Disable video interactions on YouTube to maintain focus',
+    name: 'Nocturne',
+    description: 'A checkpoint against distracting feeds. Blocks YouTube recommendations; free at night.',
     permissions: ['storage'],
     host_permissions: ['*://*.youtube.com/*'],
     icons: {

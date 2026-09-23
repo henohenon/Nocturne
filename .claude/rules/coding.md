@@ -20,17 +20,17 @@ Conventions derived from the existing codebase. Follow these when reading or wri
 
 ## Logging
 
-All `console.*` calls use the `[YT Overlay]` prefix:
+All `console.*` calls use the `[Nocturne]` prefix:
 ```ts
-console.log('[YT Overlay] ...');
-console.error('[YT Overlay] ...');
+console.log('[Nocturne] ...');
+console.error('[Nocturne] ...');
 ```
 
 ## Style Injection
 
 Inject CSS via a `<style>` tag with a fixed `id`. Check for the id before inserting to avoid duplicates:
 ```ts
-if (document.getElementById('yt-overlay-styles')) return;
+if (document.getElementById('nocturne-styles')) return;
 ```
 
 ## File Structure
