@@ -12,7 +12,7 @@
 - Caption escalates: 分だけ無効化 → 分も無効化 → 分も……？ → 分。本気？
 
 ## Streak confrontation
-- Starts calm whatever the minutes; hovering or focusing "それでも解く" (locked or not) awakens it: full dread, eyes stare at the button; leaving calms it
+- Starts calm whatever the minutes; hovering or focusing "それでも解く" (locked or not) awakens it: full dread, the eyes keep following the cursor; leaving calms it
 
 ## Toolbar icon
 - Stars as black discs with red dots (32px / 16px: hand-placed red pixels)

@@ -130,14 +130,6 @@ function thumbPosition(): readonly [number, number] {
 }
 
 /**
- * Screen position of an element's center
- */
-function centerOf(el: Element): readonly [number, number] {
-  const rect = el.getBoundingClientRect();
-  return [rect.left + rect.width / 2, rect.top + rect.height / 2];
-}
-
-/**
  * Awaken every eye while the proceed button is hovered or focused (the locked button too); calm again otherwise
  */
 function updateAwake(): void {
@@ -149,11 +141,11 @@ function updateAwake(): void {
 }
 
 /**
- * Point every iris, each from its own resting spot, at the cursor - or at the slider thumb while it is dragged or in the dread zone
+ * Point every iris, each from its own resting spot, at the cursor (also while awakened) - or at the slider thumb while it is dragged or in the dread zone
  */
 function look(): void {
   const staring = !formView.hidden && (dragging || Number(minutesInput.value) > DREAD_FROM_MIN);
-  const [tx, ty] = awake ? centerOf(proceedBtn) : staring ? thumbPosition() : pointer;
+  const [tx, ty] = staring ? thumbPosition() : pointer;
   const ctm = eyeEl.getScreenCTM();
   if (!ctm) return;
   for (const iris of irisEls) {
