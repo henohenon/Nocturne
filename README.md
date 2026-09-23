@@ -28,7 +28,7 @@ bun run dev        # dev build with auto-reload → load dist/chrome-mv3-dev onc
 bun run build      # production build → dist/chrome-mv3
 bun run zip        # release zip → dist/nocturne-<version>-chrome.zip
 bun run type-check
-bun run test         # unit tests (shared state)
+bun run test       # unit tests (shared state)
 ```
 
 Keep only one of the dev / production builds enabled at a time — they are separate extensions with separate state.

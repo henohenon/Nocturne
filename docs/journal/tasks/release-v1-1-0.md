@@ -22,6 +22,7 @@
 - CI/CD は GitHub 公開準備の時点でほぼ揃っていた（ユーザーも「もうできてるのか」）。追加実装より運用ルールの明文化が効いた
 - Actions の警告: `actions/checkout@v4` が Node.js 20 で非推奨、`ubuntu-latest` が 2026-10-19 から Ubuntu 26 に移行
 
-## 次のアクション
-- `actions/checkout` を v5 系に更新（非推奨警告の解消）
-- 単体テストをリポジトリに入れて CI で回す（今はスクラッチでのみ実行）
+## 追記: CI の整備
+- `actions/checkout` を v7（Node 24）に更新し、Node.js 20 非推奨警告を解消
+- 共有状態の単体テスト（9件: 夜間スケジュール・手動無効化・連続判定・夜間の封印）を `tests/` に追加、`bun run test` を CI とリリースに組み込み。UTC / 太平洋時間でも通ることを確認
+- `ubuntu-latest` の Ubuntu 26 移行は告知のみ。追従で問題ないため固定しない
