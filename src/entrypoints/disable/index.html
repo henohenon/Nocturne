@@ -3,124 +3,131 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>⚠ Nocturne - 無効化</title>
+  <title>Nocturne - 封印を解く</title>
   <style>
+    :root {
+      --ink: #0e0e16;
+      --gold: #bc912f;
+      --gold-soft: rgba(188, 145, 47, 0.38);
+      --gold-faint: rgba(188, 145, 47, 0.14);
+      --bone: #e9e2cf;
+      --muted: #8b8575;
+      --crimson: #c8283c;
+      --serif: Georgia, 'Yu Mincho', 'YuMincho', 'Hiragino Mincho ProN', serif;
+      --sans: 'Segoe UI', 'Yu Gothic UI', 'Hiragino Sans', sans-serif;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
     body {
-      display: flex;
-      flex-direction: column;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: #ffecec;
-      background: radial-gradient(circle at 50% 35%, #5c0000 0%, #2a0000 55%, #0d0000 100%);
-      animation: throb 2.4s ease-in-out infinite;
-      user-select: none;
-    }
-    @keyframes throb {
-      0%, 100% { box-shadow: inset 0 0 40px 6px rgba(255, 0, 0, 0.35); }
-      50% { box-shadow: inset 0 0 90px 22px rgba(255, 0, 0, 0.65); }
-    }
-    .tape {
-      height: 22px;
-      flex: none;
-      background: repeating-linear-gradient(-45deg, #ffcc00 0 16px, #111 16px 32px);
-      animation: crawl 1.2s linear infinite;
-      background-size: 45px 45px;
-    }
-    @keyframes crawl { to { background-position: 45px 0; } }
-    main {
-      flex: 1;
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 14px;
-      padding: 20px 28px;
+      padding: 32px 40px;
+      font-family: var(--sans);
       text-align: center;
+      color: var(--bone);
+      background:
+        radial-gradient(ellipse at 50% 30%, rgba(160, 20, 40, 0.42) 0%, rgba(90, 10, 24, 0.18) 45%, transparent 75%),
+        var(--ink);
+      animation: throb 2.8s ease-in-out infinite;
+      user-select: none;
     }
-    .sign {
-      font-size: 64px;
-      line-height: 1;
-      color: #ff2d2d;
-      text-shadow: 0 0 18px rgba(255, 40, 40, 0.9);
-      animation: blink 1s steps(2, start) infinite;
+    @keyframes throb {
+      0%, 100% { box-shadow: inset 0 0 50px 6px rgba(200, 40, 60, 0.25); }
+      50% { box-shadow: inset 0 0 90px 18px rgba(200, 40, 60, 0.5); }
     }
-    @keyframes blink { 50% { opacity: 0.35; } }
+
+    /* Double gold frame */
+    body::before, body::after { content: ''; position: absolute; pointer-events: none; }
+    body::before { inset: 10px; border: 1px solid var(--gold-soft); }
+    body::after { inset: 15px; border: 1px solid var(--gold-faint); }
+
+    /* Mark and heading */
+    .mark { width: 84px; height: 84px; color: var(--crimson); filter: drop-shadow(0 0 14px rgba(220, 40, 60, 0.75)); }
+    .kicker { margin-top: 2px; font-size: 11px; letter-spacing: 0.42em; color: var(--gold); }
     h1 {
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      color: #ff3b3b;
-      text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+      font-family: var(--serif);
+      font-size: 30px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      color: #f0d9d9;
+      text-shadow: 0 0 14px rgba(220, 40, 60, 0.6);
     }
-    .lead { font-size: 14px; line-height: 1.7; color: #ffc9c9; }
-    .lead strong { color: #fff; }
+    .lead { font-size: 14px; line-height: 1.8; color: #d9cfc0; }
+    .lead strong { font-weight: 600; color: #fff; }
+
+    /* Duration input */
     .duration {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       gap: 8px;
-      margin-top: 6px;
-      font-size: 14px;
-      color: #ffb3b3;
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--muted);
     }
     #minutes {
-      width: 72px;
-      padding: 8px;
-      border: 2px solid #ff3b3b;
-      border-radius: 6px;
-      background: #1a0000;
-      color: #fff;
-      font-size: 18px;
-      font-weight: 700;
+      width: 64px;
+      padding: 0 0 2px;
+      border: none;
+      border-bottom: 1px solid var(--gold);
+      background: transparent;
+      color: var(--bone);
+      font-family: var(--serif);
+      font-size: 26px;
       text-align: center;
     }
-    .buttons { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 8px; }
+    #minutes:focus { outline: none; border-bottom-color: var(--bone); }
+
+    /* Buttons - breaking the seal is the heaviest element */
+    .buttons { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 10px; }
     button {
       width: 100%;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 6px;
+      font-family: var(--serif);
       font-size: 15px;
-      font-weight: 700;
+      letter-spacing: 0.3em;
       cursor: pointer;
     }
     #disable {
-      border: 2px solid #ff3b3b;
-      background: #b30000;
+      border: 1px solid var(--crimson);
+      background: #8e1426;
       color: #fff;
-      letter-spacing: 0.1em;
+      box-shadow: 0 0 18px rgba(200, 40, 60, 0.45);
     }
-    #disable:hover { background: #d40000; }
-    #disable:disabled { background: #3a1010; border-color: #5a2020; color: #886; cursor: not-allowed; }
-    #cancel {
-      border: 1px solid #555;
-      background: #1c1c1c;
-      color: #ccc;
-    }
-    #cancel:hover { background: #2a2a2a; }
-    #notice { font-size: 13px; color: #ffcc00; min-height: 1em; }
+    #disable:hover { background: #a8182d; }
+    #disable:disabled { border-color: #4a1a22; background: #2a0f16; color: var(--muted); box-shadow: none; cursor: not-allowed; }
+    #cancel { border: 1px solid var(--gold-soft); background: transparent; color: var(--gold); }
+    #cancel:hover { background: var(--gold-faint); }
+    #notice { min-height: 1em; font-size: 13px; color: var(--gold); }
   </style>
 </head>
 <body>
-  <div class="tape"></div>
-  <main>
-    <div class="sign">⚠</div>
-    <h1>DANGER ZONE</h1>
-    <p class="lead">
-      ブロックを外すと、おすすめ動画が<br>
-      <strong>あなたの時間を奪いに来ます。</strong><br>
-      本当に今、それが必要ですか？
-    </p>
-    <label class="duration">
-      <input id="minutes" type="number" min="1" max="120" value="30">
-      分だけ無効化（最大120分）
-    </label>
-    <div id="notice"></div>
-    <div class="buttons">
-      <button id="disable">無効化する</button>
-      <button id="cancel">やめておく</button>
-    </div>
-  </main>
-  <div class="tape"></div>
+  <svg class="mark" viewBox="0 0 128 128" aria-hidden="true">
+    <defs><mask id="lid"><rect width="128" height="128" fill="white"/><circle cx="64" cy="36" r="40" fill="black"/></mask></defs>
+    <circle cx="64" cy="50" r="40" fill="currentColor" mask="url(#lid)"/>
+    <g stroke="currentColor" stroke-width="6.5" stroke-linecap="round"><line x1="64" y1="86" x2="64" y2="107.2"/><line x1="41.25" y1="76.95" x2="29.45" y2="95.3"/><line x1="86.75" y1="76.95" x2="98.55" y2="95.3"/></g>
+    <circle cx="100" cy="26" r="4.4" fill="currentColor"/><circle cx="84" cy="16" r="2.75" fill="currentColor"/>
+  </svg>
+  <div class="kicker">DANGER ZONE</div>
+  <h1>封印を解く</h1>
+  <p class="lead">
+    ブロックを外すと、おすすめ動画が<br>
+    <strong>あなたの時間を奪いに来ます。</strong><br>
+    本当に今、それが必要ですか？
+  </p>
+  <label class="duration">
+    <input id="minutes" type="number" min="1" max="120" value="30">
+    分だけ無効化（最大120分）
+  </label>
+  <div id="notice"></div>
+  <div class="buttons">
+    <button id="disable">無効化する</button>
+    <button id="cancel">やめておく</button>
+  </div>
   <script type="module" src="./main.ts"></script>
 </body>
 </html>

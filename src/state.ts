@@ -1,6 +1,6 @@
 /**
  * Nocturne - Shared state
- * Single source of truth for manual disable, streak, and night schedule
+ * Single source of truth for manual disable, streak, night schedule, and night seal
  */
 
 import {
@@ -21,9 +21,11 @@ export interface DisableRecord {
   lastDisableEnd: number;
   /** Consecutive disable count including the latest one */
   streakCount: number;
+  /** End of the current night's voluntary seal; 0 when not sealed */
+  nightSealUntil: number;
 }
 
-const EMPTY_RECORD: DisableRecord = { disabledUntil: 0, lastDisableEnd: 0, streakCount: 0 };
+const EMPTY_RECORD: DisableRecord = { disabledUntil: 0, lastDisableEnd: 0, streakCount: 0, nightSealUntil: 0 };
 
 /** Read the disable record from storage */
 export async function loadRecord(): Promise<DisableRecord> {
@@ -46,14 +48,28 @@ export function isInSchedule(now: Date): boolean {
   return minutes >= SCHEDULE_START_MIN || minutes < SCHEDULE_END_MIN;
 }
 
+/** End of the night schedule period that is in progress (or next ends) after the given time, as epoch ms */
+export function scheduleEnd(now: Date): number {
+  const end = new Date(now);
+  end.setHours(Math.floor(SCHEDULE_END_MIN / 60), SCHEDULE_END_MIN % 60, 0, 0);
+  if (end.getTime() <= now.getTime()) end.setDate(end.getDate() + 1);
+  return end.getTime();
+}
+
 /** Whether a manual disable is in effect */
 export function isManuallyDisabled(record: DisableRecord, nowMs: number): boolean {
   return record.disabledUntil > nowMs;
 }
 
+/** Whether the user sealed the current night */
+export function isNightSealed(record: DisableRecord, nowMs: number): boolean {
+  return record.nightSealUntil > nowMs;
+}
+
 /** Whether the overlay should currently be applied */
 export function isOverlayActive(record: DisableRecord, now: Date): boolean {
-  return !isInSchedule(now) && !isManuallyDisabled(record, now.getTime());
+  if (isInSchedule(now)) return isNightSealed(record, now.getTime());
+  return !isManuallyDisabled(record, now.getTime());
 }
 
 /** Streak number the next disable would get */
@@ -73,7 +89,7 @@ export async function disableFor(minutes: number): Promise<void> {
   const nowMs = Date.now();
   const record = await loadRecord();
   const until = nowMs + clampMinutes(minutes) * 60 * 1000;
-  await saveRecord({ disabledUntil: until, lastDisableEnd: until, streakCount: nextStreakCount(record, nowMs) });
+  await saveRecord({ ...record, disabledUntil: until, lastDisableEnd: until, streakCount: nextStreakCount(record, nowMs) });
 }
 
 /** End the current manual disable immediately */
@@ -82,6 +98,14 @@ export async function enableNow(): Promise<void> {
   const record = await loadRecord();
   if (!isManuallyDisabled(record, nowMs)) return;
   await saveRecord({ ...record, disabledUntil: 0, lastDisableEnd: nowMs });
+}
+
+/** Seal (or unseal) the rest of the current night for all tabs */
+export async function setNightSeal(sealed: boolean): Promise<void> {
+  const now = new Date();
+  const record = await loadRecord();
+  if (sealed && !isInSchedule(now)) return;
+  await saveRecord({ ...record, nightSealUntil: sealed ? scheduleEnd(now) : 0 });
 }
 
 /** Format minutes from midnight as HH:MM */
