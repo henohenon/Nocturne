@@ -22,22 +22,36 @@ import {
 /** Cursor distance (px) at which each iris reaches its max offset (its data-reach, SVG units) */
 const IRIS_FULL_REACH_PX = 220;
 
-/** Slider color by minutes: white -> gold -> red -> blood black */
+/** Slider color by minutes: white -> gold -> red -> deep crimson */
 const DURATION_COLOR_STOPS: ReadonlyArray<readonly [number, readonly [number, number, number]]> = [
   [0, [244, 239, 228]],
   [30, [188, 145, 47]],
   [90, [255, 42, 61]],
-  [120, [110, 0, 22]],
+  [120, [200, 0, 32]],
 ];
-/** Past this, the color is too dark to glow in itself; glow in bright red instead */
-const DURATION_GLOW_SWITCH_MIN = 90;
-const DURATION_GLOW_DARK: readonly [number, number, number] = [255, 42, 61];
-/** Past this, the number trembles */
-const DURATION_DREAD_MIN = 100;
+/** Dread zone: past this the number breaks, the room closes in, the eyes widen and stop blinking */
+const DREAD_FROM_MIN = 90;
+const DREAD_GLOW: readonly [number, number, number] = [255, 42, 61];
+/** Pupils start to slit from here, fully slit at the max */
+const SLIT_FROM_MIN = 60;
+/** How much wider the eyes open at the max */
+const DREAD_WIDEN = 0.18;
+/** Heartbeat period (s) at 0 min and how much faster it gets at the max */
+const BEAT_BASE_SEC = 1.6;
+const BEAT_SPEEDUP_SEC = 1.15;
+/** Glitch flicker starts once this far into the dread zone (0-1) */
+const FLICKER_FROM_K = 0.3;
+/** Caption under the number, by the highest minutes it applies to */
+const DURATION_CAPTIONS: ReadonlyArray<readonly [number, string]> = [
+  [60, '分だけ無効化'],
+  [90, '分も無効化'],
+  [119, '分も……？'],
+  [120, '分。本気？'],
+];
 
 const minutesInput = document.getElementById('minutes') as HTMLInputElement;
-const minutesView = document.getElementById('minutes-view')!;
 const minutesValue = document.getElementById('minutes-value')!;
+const minutesCaption = document.getElementById('minutes-caption')!;
 const disableBtn = document.getElementById('disable') as HTMLButtonElement;
 const cancelBtn = document.getElementById('cancel') as HTMLButtonElement;
 const noticeEl = document.getElementById('notice')!;
@@ -48,6 +62,12 @@ const walkBtn = document.getElementById('walk') as HTMLButtonElement;
 const proceedBtn = document.getElementById('proceed') as HTMLButtonElement;
 const eyeEl = document.querySelector('.eye') as SVGSVGElement;
 const irisEls = Array.from(document.querySelectorAll<SVGGElement>('.iris'));
+const pupilEls = Array.from(document.querySelectorAll<SVGEllipseElement>('.pupil'));
+
+/** Last cursor position; the eyes look here unless they stare at the slider */
+let pointer: readonly [number, number] = [window.innerWidth / 2, window.innerHeight / 2];
+/** True while the slider is being dragged */
+let dragging = false;
 
 /**
  * Seconds the proceed button stays locked for the given streak count
@@ -64,6 +84,7 @@ function confront(count: number): Promise<boolean> {
   formView.hidden = true;
   confrontView.hidden = false;
   document.body.classList.add('confront');
+  document.body.classList.remove('max');
   walkBtn.focus();
 
   let remaining = streakWaitSec(count);
@@ -97,17 +118,29 @@ function confront(count: number): Promise<boolean> {
 }
 
 /**
- * Point every iris toward the cursor
+ * Screen position of the slider thumb
  */
-function followCursor(event: MouseEvent): void {
-  const rect = eyeEl.getBoundingClientRect();
-  const dx = event.clientX - (rect.left + rect.width / 2);
-  const dy = event.clientY - (rect.top + rect.height * 0.42);
-  const distance = Math.hypot(dx, dy);
-  if (distance === 0) return;
-  const pull = Math.min(distance / IRIS_FULL_REACH_PX, 1) / distance;
+function thumbPosition(): readonly [number, number] {
+  const rect = minutesInput.getBoundingClientRect();
+  const fill = (Number(minutesInput.value) - DISABLE_STEP_MIN) / (DISABLE_MAX_MIN - DISABLE_STEP_MIN);
+  return [rect.left + 7 + fill * (rect.width - 14), rect.top + rect.height / 2];
+}
+
+/**
+ * Point every iris, each from its own resting spot, at the cursor - or at the slider thumb while it is dragged or in the dread zone
+ */
+function look(): void {
+  const staring = !formView.hidden && (dragging || Number(minutesInput.value) > DREAD_FROM_MIN);
+  const [tx, ty] = staring ? thumbPosition() : pointer;
+  const ctm = eyeEl.getScreenCTM();
+  if (!ctm) return;
   for (const iris of irisEls) {
-    const reach = Number(iris.dataset.reach) * pull;
+    const origin = new DOMPoint(Number(iris.dataset.cx), Number(iris.dataset.cy)).matrixTransform(ctm);
+    const dx = tx - origin.x;
+    const dy = ty - origin.y;
+    const distance = Math.hypot(dx, dy);
+    if (distance === 0) continue;
+    const reach = (Math.min(distance / IRIS_FULL_REACH_PX, 1) * Number(iris.dataset.reach)) / distance;
     iris.setAttribute('transform', `translate(${(dx * reach).toFixed(2)} ${(dy * reach).toFixed(2)})`);
   }
 }
@@ -128,21 +161,36 @@ function durationColor(minutes: number): readonly [number, number, number] {
 }
 
 /**
- * Show the slider's minutes and paint number, fill and thumb in its color
+ * Show the slider's minutes: one color for number, fill and thumb; past the dread line the number breaks and the room closes in
  */
 function renderDuration(): void {
   const minutes = Number(minutesInput.value);
   const color = durationColor(minutes);
-  const glow = minutes > DURATION_GLOW_SWITCH_MIN ? DURATION_GLOW_DARK : color;
+  const glow = minutes > DREAD_FROM_MIN ? DREAD_GLOW : color;
   const fill = (minutes - DISABLE_STEP_MIN) / (DISABLE_MAX_MIN - DISABLE_STEP_MIN);
-  for (const el of [minutesInput, minutesView]) {
-    el.style.setProperty('--c', `rgb(${color.join(' ')})`);
-    el.style.setProperty('--g', `rgb(${glow.join(' ')})`);
-    el.style.setProperty('--t', String(minutes / DISABLE_MAX_MIN));
-    el.style.setProperty('--p', `${fill * 100}%`);
+  const dread = Math.max(0, (minutes - DREAD_FROM_MIN) / (DISABLE_MAX_MIN - DREAD_FROM_MIN));
+  const slit = Math.max(0, (minutes - SLIT_FROM_MIN) / (DISABLE_MAX_MIN - SLIT_FROM_MIN));
+  const body = document.body;
+  body.style.setProperty('--c', `rgb(${color.join(' ')})`);
+  body.style.setProperty('--g', `rgb(${glow.join(' ')})`);
+  body.style.setProperty('--t', String(minutes / DISABLE_MAX_MIN));
+  body.style.setProperty('--p', `${fill * 100}%`);
+  body.style.setProperty('--k', String(dread));
+  body.style.setProperty('--wide', String(1 + DREAD_WIDEN * dread));
+  body.style.setProperty('--beat', `${BEAT_BASE_SEC - BEAT_SPEEDUP_SEC * (minutes / DISABLE_MAX_MIN)}s`);
+  body.classList.toggle('dread', dread > 0);
+  body.classList.toggle('flicker', dread > FLICKER_FROM_K);
+  body.classList.toggle('max', minutes >= DISABLE_MAX_MIN);
+  for (const pupil of pupilEls) {
+    const r = Number(pupil.dataset.r);
+    const [rxAtSlit, ryAtSlit] = (pupil.dataset.slit ?? '1 1').split(' ').map(Number) as [number, number];
+    pupil.setAttribute('rx', (r * (1 + (rxAtSlit - 1) * slit)).toFixed(2));
+    pupil.setAttribute('ry', (r * (1 + (ryAtSlit - 1) * slit)).toFixed(2));
   }
-  minutesView.classList.toggle('dread', minutes > DURATION_DREAD_MIN);
   minutesValue.textContent = String(minutes);
+  minutesValue.dataset.text = String(minutes);
+  minutesCaption.textContent = DURATION_CAPTIONS.find(([upTo]) => minutes <= upTo)?.[1] ?? '';
+  look();
 }
 
 /**
@@ -182,6 +230,8 @@ minutesInput.max = String(DISABLE_MAX_MIN);
 minutesInput.step = String(DISABLE_STEP_MIN);
 minutesInput.value = String(DISABLE_DEFAULT_MIN);
 minutesInput.addEventListener('input', renderDuration);
+minutesInput.addEventListener('pointerdown', () => { dragging = true; look(); });
+window.addEventListener('pointerup', () => { dragging = false; look(); });
 renderDuration();
 
 disableBtn.addEventListener('click', () => {
@@ -192,6 +242,9 @@ disableBtn.addEventListener('click', () => {
   });
 });
 cancelBtn.addEventListener('click', () => window.close());
-document.addEventListener('mousemove', followCursor);
+document.addEventListener('mousemove', (event) => {
+  pointer = [event.clientX, event.clientY];
+  look();
+});
 
 checkAvailability();
