@@ -4,3 +4,7 @@ dist/
 *.log
 .DS_Store
 src/*.js
+
+# IDE / local-only config
+.idea/
+.claude/settings.local.json
