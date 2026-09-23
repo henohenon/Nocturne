@@ -1,155 +1,87 @@
 /**
  * YouTube Overlay - Extension Popup
+ * Shows current state; opens the dedicated disable window or re-enables
  */
 
-const STORAGE_KEY = 'disableDurationMin';
-const DEFAULT_DURATION_MIN = 3;
-const MAX_DURATION_MIN = 20;
+import { LEGACY_STORAGE_KEYS, SCHEDULE_END_MIN, SCHEDULE_START_MIN } from '../../config';
+import {
+  enableNow,
+  formatClock,
+  formatRemaining,
+  isInSchedule,
+  isManuallyDisabled,
+  loadRecord,
+} from '../../state';
+
+const RENDER_INTERVAL_MS = 500;
+const DISABLE_WINDOW_WIDTH = 440;
+const DISABLE_WINDOW_HEIGHT = 560;
 
 const statusEl = document.getElementById('status')!;
-const toggleBtn = document.getElementById('toggle') as HTMLButtonElement;
-const durationInput = document.getElementById('duration') as HTMLInputElement;
+const noteEl = document.getElementById('note')!;
+const actionBtn = document.getElementById('action') as HTMLButtonElement;
 
-let countdownInterval: ReturnType<typeof setInterval> | null = null;
-
-/**
- * Get cooldown duration in ms from input current value
- */
-function getCooldownMs(): number {
-  return getSelectedDurationMs();
-}
+type Mode = 'active' | 'disabled' | 'schedule';
+let mode: Mode = 'active';
 
 /**
- * Get the selected duration in milliseconds, clamped to 1–20 min
+ * Render the popup from stored state and the clock
  */
-function getSelectedDurationMs(): number {
-  const minutes = Math.max(1, Math.min(MAX_DURATION_MIN, parseInt(durationInput.value, 10) || DEFAULT_DURATION_MIN));
-  durationInput.value = String(minutes);
-  return minutes * 60 * 1000;
-}
+async function render(): Promise<void> {
+  const now = new Date();
+  const record = await loadRecord();
 
-/**
- * Format remaining milliseconds as M:SS
- */
-function formatTime(ms: number): string {
-  const totalSeconds = Math.ceil(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-}
-
-/**
- * Update UI to reflect disabled state
- */
-function setDisabledUI(remainingMs: number): void {
-  if (countdownInterval) clearInterval(countdownInterval);
-
-  statusEl.textContent = `無効中 ${formatTime(remainingMs)}`;
-  statusEl.className = 'disabled';
-  toggleBtn.textContent = '今すぐ再有効化';
-  toggleBtn.className = 'active';
-  durationInput.disabled = true;
-
-  const endTime = Date.now() + remainingMs;
-  countdownInterval = setInterval(() => {
-    const left = endTime - Date.now();
-    if (left <= 0) {
-      setCooldownUI(getCooldownMs());
-    } else {
-      statusEl.textContent = `無効中 ${formatTime(left)}`;
-    }
-  }, 500);
-}
-
-/**
- * Update UI to reflect enabled state
- */
-function setEnabledUI(): void {
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
+  if (isInSchedule(now)) {
+    mode = 'schedule';
+    statusEl.textContent = '夜間モード（無効）';
+    statusEl.className = 'off';
+    noteEl.textContent = `${formatClock(SCHEDULE_START_MIN)}〜${formatClock(SCHEDULE_END_MIN)} は自動で無効`;
+    actionBtn.hidden = true;
+  } else if (isManuallyDisabled(record, now.getTime())) {
+    mode = 'disabled';
+    statusEl.textContent = `無効中 ${formatRemaining(record.disabledUntil - now.getTime())}`;
+    statusEl.className = 'off';
+    noteEl.textContent = `連続 ${record.streakCount} 回目`;
+    actionBtn.hidden = false;
+    actionBtn.textContent = '今すぐ再有効化';
+    actionBtn.className = 'enable';
+  } else {
+    mode = 'active';
+    statusEl.textContent = '有効';
+    statusEl.className = '';
+    noteEl.textContent = '';
+    actionBtn.hidden = false;
+    actionBtn.textContent = '無効化…';
+    actionBtn.className = 'danger';
   }
-  statusEl.textContent = '有効';
-  statusEl.className = '';
-  toggleBtn.textContent = '無効化';
-  toggleBtn.className = '';
-  durationInput.disabled = false;
 }
 
 /**
- * Update UI to reflect cooldown state
+ * Open the dedicated disable window and close the popup
  */
-function setCooldownUI(remainingMs: number): void {
-  if (countdownInterval) clearInterval(countdownInterval);
-
-  statusEl.textContent = `有効（待機 ${formatTime(remainingMs)}）`;
-  statusEl.className = '';
-  toggleBtn.textContent = '待機中...';
-  toggleBtn.className = 'cooldown';
-  durationInput.disabled = true;
-
-  const endTime = Date.now() + remainingMs;
-  countdownInterval = setInterval(() => {
-    const left = endTime - Date.now();
-    if (left <= 0) {
-      setEnabledUI();
-    } else {
-      statusEl.textContent = `有効（待機 ${formatTime(left)}）`;
-    }
-  }, 500);
+async function openDisableWindow(): Promise<void> {
+  await chrome.windows.create({
+    url: chrome.runtime.getURL('/disable.html'),
+    type: 'popup',
+    width: DISABLE_WINDOW_WIDTH,
+    height: DISABLE_WINDOW_HEIGHT,
+  });
+  window.close();
 }
 
-/**
- * Send a message to the active tab's content script
- */
-async function sendToContentScript(message: Record<string, unknown>): Promise<any> {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id) return null;
+actionBtn.addEventListener('click', async () => {
   try {
-    return await chrome.tabs.sendMessage(tab.id, message);
-  } catch {
-    return null;
-  }
-}
-
-// Restore saved duration preference
-chrome.storage.local.get(STORAGE_KEY, (result) => {
-  const saved = result[STORAGE_KEY] as number | undefined;
-  if (saved && saved >= 1 && saved <= MAX_DURATION_MIN) {
-    durationInput.value = String(saved);
+    if (mode === 'disabled') {
+      await enableNow();
+      await render();
+    } else if (mode === 'active') {
+      await openDisableWindow();
+    }
+  } catch (error) {
+    console.error('[YT Overlay] Popup action failed:', error);
   }
 });
 
-// Fetch current state from content script
-sendToContentScript({ type: 'GET_STATE' }).then((state) => {
-  if (state?.disabled) {
-    setDisabledUI(state.remainingMs);
-  } else if (state?.cooldown) {
-    setCooldownUI(state.cooldownMs);
-  } else {
-    setEnabledUI();
-  }
-});
-
-// Persist duration choice on change
-durationInput.addEventListener('change', () => {
-  const minutes = Math.max(1, Math.min(MAX_DURATION_MIN, parseInt(durationInput.value, 10) || DEFAULT_DURATION_MIN));
-  durationInput.value = String(minutes);
-  chrome.storage.local.set({ [STORAGE_KEY]: minutes });
-});
-
-// Toggle button click
-toggleBtn.addEventListener('click', async () => {
-  if (toggleBtn.className === 'cooldown') {
-    return;
-  } else if (toggleBtn.className === 'active') {
-    const cooldownMs = getCooldownMs();
-    await sendToContentScript({ type: 'ENABLE', cooldownMs });
-    setCooldownUI(cooldownMs);
-  } else {
-    const durationMs = getSelectedDurationMs();
-    const cooldownMs = getCooldownMs();
-    await sendToContentScript({ type: 'DISABLE', durationMs, cooldownMs });
-    setDisabledUI(durationMs);
-  }
-});
+chrome.storage.local.remove(LEGACY_STORAGE_KEYS);
+render();
+setInterval(render, RENDER_INTERVAL_MS);

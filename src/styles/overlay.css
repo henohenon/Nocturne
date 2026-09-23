@@ -7,7 +7,8 @@
 /*
  * Blocked items
  * Targets: video item, Shorts item, Shorts player item, home grid wrapper
- * Allowlist (:has): live badge (metadata / thumbnail), mix/playlist stacked thumbnail
+ * Allowed: mix/playlist (stacked thumbnail), or official artist channel (metadata icon label, ja/en) unless live
+ * Blocked: everything else, including all live streams
  */
 :is(
   yt-lockup-view-model,
@@ -15,10 +16,17 @@
   ytd-reel-video-renderer,
   ytd-rich-item-renderer
 ):not(:has(
-  .ytBadgeShapeLive,
-  .ytBadgeShapeThumbnailLive,
   .ytCollectionThumbnailViewModelHost
-)) {
+)):is(
+  :not(:has(.ytContentMetadataViewModelIcon:is(
+    [aria-label="公式アーティスト チャンネル"],
+    [aria-label="Official Artist Channel"]
+  ))),
+  :has(
+    .ytBadgeShapeLive,
+    .ytBadgeShapeThumbnailLive
+  )
+) {
   pointer-events: none !important;
   cursor: default !important;
 
@@ -32,7 +40,7 @@
   }
 
   /* Thumbnail badges (duration, "new", etc.) - hide completely */
-  & :is(.ytThumbnailBottomOverlayViewModelHost, .ytBadgeViewModelHost) {
+  & :is(.ytThumbnailBottomOverlayViewModelHost, .ytThumbnailOverlayBadgeViewModelHost, .ytBadgeViewModelHost) {
     display: none !important;
   }
 

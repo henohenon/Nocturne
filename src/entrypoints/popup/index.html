@@ -18,31 +18,17 @@
     #status {
       font-size: 15px;
       font-weight: 600;
-      margin-bottom: 14px;
+      margin-bottom: 4px;
       color: #4caf50;
     }
-    #status.disabled { color: #ff9800; }
-    .duration-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 10px;
+    #status.off { color: #ff9800; }
+    #note {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 14px;
+      min-height: 1em;
     }
-    #duration {
-      width: 52px;
-      padding: 6px 8px;
-      border: 1px solid #444;
-      border-radius: 6px;
-      font-size: 13px;
-      background: #2a2a2a;
-      color: #eee;
-      text-align: center;
-    }
-    .duration-label {
-      font-size: 13px;
-      color: #aaa;
-    }
-    #toggle {
+    #action {
       width: 100%;
       padding: 8px 12px;
       border: none;
@@ -54,19 +40,18 @@
       color: #eee;
       transition: background 0.15s;
     }
-    #toggle:hover { background: #444; }
-    #toggle.active { background: #2e5a2e; color: #8bc34a; }
-    #toggle.cooldown { background: #2a2a2a; color: #666; cursor: not-allowed; }
+    #action:hover { background: #444; }
+    #action.danger { background: #3a1414; color: #ff6b6b; }
+    #action.danger:hover { background: #4a1a1a; }
+    #action.enable { background: #2e5a2e; color: #8bc34a; }
+    #action[hidden] { display: none; }
   </style>
 </head>
 <body>
   <h1>YOUTUBE OVERLAY</h1>
   <div id="status">有効</div>
-  <div class="duration-row">
-    <input id="duration" type="number" min="1" max="20" value="3">
-    <span class="duration-label">分</span>
-  </div>
-  <button id="toggle">無効化</button>
+  <div id="note"></div>
+  <button id="action" class="danger">無効化…</button>
   <script type="module" src="./main.ts"></script>
 </body>
 </html>

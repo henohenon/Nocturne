@@ -10,7 +10,7 @@ export default defineConfig({
   manifest: {
     name: 'YouTube Overlay',
     description: 'Disable video interactions on YouTube to maintain focus',
-    permissions: ['tabs', 'storage'],
+    permissions: ['storage'],
     host_permissions: ['*://*.youtube.com/*'],
     icons: {
       16: 'icons/icon16.png',

@@ -1,20 +1,13 @@
 /**
  * YouTube Overlay - Content Script
  * Blocks recommendation items on YouTube
- * Allow/block judgment lives in overlay.css (:has allowlist: live, mixes)
+ * Allow/block judgment lives in overlay.css (:has allowlist: artist videos, mixes)
+ * On/off follows shared state (manual disable, night schedule) in extension storage
  */
 
 import overlayStyles from '../styles/overlay.css?inline';
-
-// Disable state
-let disableTimerId: ReturnType<typeof setTimeout> | null = null;
-let disableEndTime: number | null = null;
-
-// Cooldown state
-const COOLDOWN_STORAGE_KEY = 'cooldownEndTime';
-let cooldownTimerId: ReturnType<typeof setTimeout> | null = null;
-let cooldownEndTime: number | null = null;
-let pendingCooldownMs: number = 0;
+import { RECORD_STORAGE_KEY, REEVALUATE_INTERVAL_MS } from '../config';
+import { isOverlayActive, loadRecord } from '../state';
 
 /**
  * Inject overlay styles into the page
@@ -43,111 +36,41 @@ function injectOverlayStyles(): void {
  */
 function removeOverlayStyles(): void {
   const el = document.getElementById('yt-overlay-styles');
-  if (el) el.remove();
+  if (!el) return;
+  el.remove();
+  console.log('[YT Overlay] Styles removed');
 }
 
 /**
- * Disable the overlay for the given duration, then re-enable automatically
+ * Apply or remove the overlay according to stored state and the clock
  */
-function disableOverlay(durationMs: number): void {
-  removeOverlayStyles();
-  disableEndTime = Date.now() + durationMs;
-  if (disableTimerId) clearTimeout(disableTimerId);
-  disableTimerId = setTimeout(() => enableOverlay(), durationMs);
-  console.log(`[YT Overlay] Disabled for ${Math.round(durationMs / 1000)}s`);
-}
-
-/**
- * Re-enable the overlay and start cooldown
- */
-function enableOverlay(): void {
-  if (disableTimerId) {
-    clearTimeout(disableTimerId);
-    disableTimerId = null;
-  }
-  disableEndTime = null;
-  injectOverlayStyles();
-  if (pendingCooldownMs > 0) startCooldown(pendingCooldownMs);
-  console.log('[YT Overlay] Re-enabled');
-}
-
-/**
- * Start cooldown period during which disable is blocked
- */
-function startCooldown(durationMs: number): void {
-  cooldownEndTime = Date.now() + durationMs;
-  chrome.storage.local.set({ [COOLDOWN_STORAGE_KEY]: cooldownEndTime });
-  if (cooldownTimerId) clearTimeout(cooldownTimerId);
-  cooldownTimerId = setTimeout(() => {
-    cooldownEndTime = null;
-    cooldownTimerId = null;
-    chrome.storage.local.remove(COOLDOWN_STORAGE_KEY);
-    console.log('[YT Overlay] Cooldown ended');
-  }, durationMs);
-}
-
-/**
- * Restore cooldown from storage if still active
- */
-function restoreCooldown(): void {
-  chrome.storage.local.get(COOLDOWN_STORAGE_KEY, (result) => {
-    const saved = result[COOLDOWN_STORAGE_KEY] as number | undefined;
-    if (!saved) return;
-    const remaining = saved - Date.now();
-    if (remaining > 0) {
-      cooldownEndTime = saved;
-      cooldownTimerId = setTimeout(() => {
-        cooldownEndTime = null;
-        cooldownTimerId = null;
-        chrome.storage.local.remove(COOLDOWN_STORAGE_KEY);
-        console.log('[YT Overlay] Cooldown ended');
-      }, remaining);
-      console.log(`[YT Overlay] Cooldown restored, ${Math.round(remaining / 1000)}s remaining`);
+async function applyState(): Promise<void> {
+  try {
+    const record = await loadRecord();
+    if (isOverlayActive(record, new Date())) {
+      injectOverlayStyles();
     } else {
-      chrome.storage.local.remove(COOLDOWN_STORAGE_KEY);
+      removeOverlayStyles();
     }
-  });
-}
-
-/**
- * Handle messages from the popup
- */
-function registerMessageHandler(): void {
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (message.type === 'GET_STATE') {
-      const remaining = disableEndTime ? Math.max(0, disableEndTime - Date.now()) : 0;
-      const cooldownRemaining = cooldownEndTime ? Math.max(0, cooldownEndTime - Date.now()) : 0;
-      sendResponse({ disabled: remaining > 0, remainingMs: remaining, cooldown: cooldownRemaining > 0, cooldownMs: cooldownRemaining });
-      return true;
-    }
-    if (message.type === 'DISABLE') {
-      if (cooldownEndTime && cooldownEndTime > Date.now()) {
-        const cooldownRemaining = Math.max(0, cooldownEndTime - Date.now());
-        sendResponse({ ok: false, cooldown: true, cooldownMs: cooldownRemaining });
-        return true;
-      }
-      pendingCooldownMs = message.cooldownMs || 0;
-      disableOverlay(message.durationMs);
-      sendResponse({ ok: true });
-      return true;
-    }
-    if (message.type === 'ENABLE') {
-      pendingCooldownMs = message.cooldownMs || 0;
-      enableOverlay();
-      sendResponse({ ok: true });
-      return true;
-    }
-  });
+  } catch (error) {
+    console.error('[YT Overlay] Failed to apply state:', error);
+  }
 }
 
 export default defineContentScript({
   matches: ['*://*.youtube.com/*'],
   runAt: 'document_idle',
   /** Initialize the content script (runtime code must stay inside main; the module is evaluated at build time) */
-  main(): void {
+  main(ctx): void {
+    // Fail closed: block first, then relax if state says so
     injectOverlayStyles();
-    restoreCooldown();
-    registerMessageHandler();
+    applyState();
+
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'local' && RECORD_STORAGE_KEY in changes) applyState();
+    });
+    ctx.setInterval(applyState, REEVALUATE_INTERVAL_MS);
+
     console.log('[YT Overlay] Initialized');
   },
 });
