@@ -6,7 +6,7 @@ A Chrome extension that seals the feeds that eat your time — YouTube recommend
 
 ## Features
 
-- **YouTube** — recommended videos are blanked out. Official artist videos, playlists, and mixes still work
+- **YouTube** — recommended videos are blanked out. Music (videos YouTube marks with ♪, or from official artist channels), playlists, and mixes still work — except live streams
 - **X** — the home timeline, Explore, and sidebar trends are sealed. Notifications, DMs, profiles, posts, and posting still work
 - **Night** — off from 19:30 to 05:00, or keep the seal on for the night from the popup
 - **Breaking the seal** — takes a dedicated window; doing it again soon makes you wait longer each time
@@ -37,7 +37,7 @@ To release, bump `version` in `package.json` and push a matching `vX.Y.Z` tag �
 ## Notes
 
 - Depends on YouTube's and X's current page structure; site changes can break it until the selectors in `src/styles/` are updated
-- Official artist detection supports Japanese and English YouTube UI only
+- Music detection relies on YouTube's own ♪ badge and official artist label (Japanese / English UI); music YouTube doesn't mark stays blocked
 - Everything stays in your browser (extension local storage)
 - Not affiliated with Google, YouTube, or X Corp.
 

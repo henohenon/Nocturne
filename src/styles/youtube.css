@@ -10,7 +10,8 @@
 /*
  * Blocked items
  * Targets: video item, Shorts item, Shorts player item, home grid wrapper
- * Allowed: mix/playlist (stacked thumbnail), or official artist channel (metadata icon label, ja/en) unless live
+ * Allowed: mix/playlist (stacked thumbnail), or music unless live
+ * Music: official artist channel (metadata icon label, ja/en), or YouTube's music note on the duration badge (covers, vocaloid, lofi...)
  * Blocked: everything else, including all live streams
  */
 :is(
@@ -21,10 +22,13 @@
 ):not(:has(
   .ytCollectionThumbnailViewModelHost
 )):is(
-  :not(:has(.ytContentMetadataViewModelIcon:is(
-    [aria-label="公式アーティスト チャンネル"],
-    [aria-label="Official Artist Channel"]
-  ))),
+  :not(:has(
+    .ytContentMetadataViewModelIcon:is(
+      [aria-label="公式アーティスト チャンネル"],
+      [aria-label="Official Artist Channel"]
+    ),
+    .ytBadgeShapeThumbnailDefault .ytBadgeShapeIcon
+  )),
   :has(
     .ytBadgeShapeLive,
     .ytBadgeShapeThumbnailLive
