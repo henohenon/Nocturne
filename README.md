@@ -9,7 +9,7 @@ A Chrome extension that seals the feeds that eat your time — YouTube recommend
 - **YouTube** — recommended videos are blanked out. Music (videos YouTube marks with ♪, or from official artist channels), playlists, and mixes still work — except live streams
 - **X** — the home timeline, Explore, and sidebar trends are sealed. Notifications, DMs, profiles, posts, and posting still work
 - **Night** — off from 19:30 to 05:00, or keep the seal on for the night from the popup
-- **Breaking the seal** — takes a dedicated window; doing it again soon makes you wait longer each time
+- **Breaking the seal** — takes a dedicated window that grows more menacing the longer you ask for; doing it again soon makes you wait longer each time. While it's broken, the toolbar icon's eye stays open
 
 ## Install
 
