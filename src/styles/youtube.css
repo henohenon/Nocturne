@@ -36,6 +36,8 @@
 ) {
   pointer-events: none !important;
   cursor: default !important;
+  /* A drag selection would repaint the hidden text in the selection color */
+  user-select: none !important;
 
   /* Thumbnails - gray with the mark */
   & .ytThumbnailViewModelImage {
