@@ -9,9 +9,9 @@ export default defineConfig({
   },
   manifest: {
     name: 'Nocturne',
-    description: 'A checkpoint against distracting feeds. Blocks YouTube recommendations; free at night.',
+    description: 'A checkpoint against distracting feeds. Blocks YouTube recommendations and the X timeline; free at night.',
     permissions: ['storage'],
-    host_permissions: ['*://*.youtube.com/*'],
+    host_permissions: ['*://*.youtube.com/*', '*://x.com/*', '*://twitter.com/*'],
     icons: {
       16: 'icons/icon16.png',
       32: 'icons/icon32.png',

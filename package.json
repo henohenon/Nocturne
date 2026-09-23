@@ -15,7 +15,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "Nocturne - a checkpoint against distracting feeds (YouTube)",
+  "description": "Nocturne - a checkpoint against distracting feeds (YouTube, X)",
   "type": "module",
   "devDependencies": {
     "@types/bun": "^1.4.2",

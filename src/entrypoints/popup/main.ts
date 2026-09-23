@@ -74,7 +74,7 @@ async function render(): Promise<void> {
   } else {
     mode = 'active';
     setStatus('有効', '');
-    noteEl.textContent = 'おすすめ動画を封印中';
+    noteEl.textContent = 'おすすめとタイムラインを封印中';
     sealRow.hidden = true;
     actionBtn.hidden = false;
     actionBtn.textContent = '無効化…';
