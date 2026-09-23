@@ -70,7 +70,8 @@
       background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.35) 0 1px, transparent 1px 3px);
       opacity: calc(var(--k, 0) * 0.8);
     }
-    .eye, .view { position: relative; z-index: 1; }
+    /* Controls stay above the scanlines (views must not form their own stacking context) */
+    .eye { position: relative; z-index: 1; }
     .buttons, #minutes { position: relative; z-index: 3; }
 
     /* The eye - starts as the gold closed mark and reddens; the upper lid rises (path morph) to reveal the iris */
@@ -154,6 +155,8 @@
 
     /* Duration slider - one color (--c, set from script) for number, fill and thumb; --g is its glow */
     .duration { width: 100%; margin-top: 4px; }
+    /* Georgia's old-style figures (3, 4, 5, 7, 9) descend into the line below; use lining figures */
+    .minutes, .count strong { font-variant-numeric: lining-nums; }
     .minutes {
       font-family: var(--serif);
       font-size: 38px;
