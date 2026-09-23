@@ -40,3 +40,7 @@ To release, bump `version` in `package.json` and push a matching `vX.Y.Z` tag â€
 - Official artist detection supports Japanese and English YouTube UI only
 - Everything stays in your browser (extension local storage)
 - Not affiliated with Google, YouTube, or X Corp.
+
+## License
+
+[MIT](LICENSE)

@@ -14,7 +14,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "description": "Nocturne - a checkpoint against distracting feeds (YouTube, X)",
   "type": "module",
   "devDependencies": {
