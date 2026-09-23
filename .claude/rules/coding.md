@@ -37,4 +37,5 @@ if (document.getElementById('yt-overlay-styles')) return;
 
 - One concern per file: `content.ts` (logic), `overlay.css` (styles)
 - Configuration constants at the top of `content.ts`
+- WXT entrypoints: runtime code (`chrome.*`, DOM) only inside `main()` — the module is evaluated at build time
 - No splitting into multiple files unless the file becomes unmanageable

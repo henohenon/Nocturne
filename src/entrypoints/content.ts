@@ -4,7 +4,7 @@
  * Allow/block judgment lives in overlay.css (:has allowlist: live, mixes)
  */
 
-import overlayStyles from './styles/overlay.css?inline';
+import overlayStyles from '../styles/overlay.css?inline';
 
 // Disable state
 let disableTimerId: ReturnType<typeof setTimeout> | null = null;
@@ -112,40 +112,42 @@ function restoreCooldown(): void {
 /**
  * Handle messages from the popup
  */
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'GET_STATE') {
-    const remaining = disableEndTime ? Math.max(0, disableEndTime - Date.now()) : 0;
-    const cooldownRemaining = cooldownEndTime ? Math.max(0, cooldownEndTime - Date.now()) : 0;
-    sendResponse({ disabled: remaining > 0, remainingMs: remaining, cooldown: cooldownRemaining > 0, cooldownMs: cooldownRemaining });
-    return true;
-  }
-  if (message.type === 'DISABLE') {
-    if (cooldownEndTime && cooldownEndTime > Date.now()) {
-      const cooldownRemaining = Math.max(0, cooldownEndTime - Date.now());
-      sendResponse({ ok: false, cooldown: true, cooldownMs: cooldownRemaining });
+function registerMessageHandler(): void {
+  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message.type === 'GET_STATE') {
+      const remaining = disableEndTime ? Math.max(0, disableEndTime - Date.now()) : 0;
+      const cooldownRemaining = cooldownEndTime ? Math.max(0, cooldownEndTime - Date.now()) : 0;
+      sendResponse({ disabled: remaining > 0, remainingMs: remaining, cooldown: cooldownRemaining > 0, cooldownMs: cooldownRemaining });
       return true;
     }
-    pendingCooldownMs = message.cooldownMs || 0;
-    disableOverlay(message.durationMs);
-    sendResponse({ ok: true });
-    return true;
-  }
-  if (message.type === 'ENABLE') {
-    pendingCooldownMs = message.cooldownMs || 0;
-    enableOverlay();
-    sendResponse({ ok: true });
-    return true;
-  }
-});
-
-/**
- * Initialize the content script
- */
-function init(): void {
-  injectOverlayStyles();
-  restoreCooldown();
-  console.log('[YT Overlay] Initialized');
+    if (message.type === 'DISABLE') {
+      if (cooldownEndTime && cooldownEndTime > Date.now()) {
+        const cooldownRemaining = Math.max(0, cooldownEndTime - Date.now());
+        sendResponse({ ok: false, cooldown: true, cooldownMs: cooldownRemaining });
+        return true;
+      }
+      pendingCooldownMs = message.cooldownMs || 0;
+      disableOverlay(message.durationMs);
+      sendResponse({ ok: true });
+      return true;
+    }
+    if (message.type === 'ENABLE') {
+      pendingCooldownMs = message.cooldownMs || 0;
+      enableOverlay();
+      sendResponse({ ok: true });
+      return true;
+    }
+  });
 }
 
-// Run initialization
-init();
+export default defineContentScript({
+  matches: ['*://*.youtube.com/*'],
+  runAt: 'document_idle',
+  /** Initialize the content script (runtime code must stay inside main; the module is evaluated at build time) */
+  main(): void {
+    injectOverlayStyles();
+    restoreCooldown();
+    registerMessageHandler();
+    console.log('[YT Overlay] Initialized');
+  },
+});

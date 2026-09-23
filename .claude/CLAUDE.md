@@ -5,15 +5,17 @@
 Chrome extension that overlays YouTube videos to block interaction.
 
 ## Stack
-- TypeScript + Vite + bun
+- TypeScript + WXT (Vite) + bun
 - Chrome Extension Manifest V3
 - CSS injection via content script
 
 ## Key Paths
-- `src/content.ts` — content script entry point
+- `src/entrypoints/content.ts` — content script entry point
+- `src/entrypoints/popup/` — extension popup
 - `src/styles/overlay.css` — overlay CSS styles
-- `public/manifest.json` — extension manifest (source)
-- `dist/` — build output (Chrome extension package)
+- `wxt.config.ts` — build config + extension manifest (source)
+- `dist/chrome-mv3/` — production build; `dist/chrome-mv3-dev/` — dev build (`bun run dev`, auto-reloads)
+- `docs/` — all project documentation
 - `docs/` — all project documentation
 
 ## Conventions
