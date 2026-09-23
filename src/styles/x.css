@@ -1,4 +1,4 @@
-/* Nocturne - X: seal endless feeds (home timeline, explore) and hide the trends sidebar */
+/* Nocturne - X: seal endless feeds (home timeline, explore) and the sidebar's feed modules, keeping the layout intact */
 
 :root {
   --nocturne-gray: #3c3c42;
@@ -7,28 +7,30 @@
 }
 
 /*
- * Right sidebar (trends, who to follow) - hidden on every page
- * Current app: the aside next to <main>; older app: sidebarColumn
+ * Sidebar modules (trends, news, Spaces, who to follow, Premium) - hidden on every page
+ * The module list is the outermost sidebar element with 4+ children (its ancestors have 1-2)
+ * Kept: search box (absent on Explore), footer links; the column itself stays so the layout doesn't shift
  */
-:is(
-  main ~ aside,
-  [data-testid="sidebarColumn"]
-) {
+[data-testid="sidebarColumn"] div:has(> :nth-child(4)):not([data-testid="sidebarColumn"] div:has(> :nth-child(4)) div) > :not(:has(form[role="search"]), :has(nav)) {
   display: none !important;
 }
 
 /*
- * Feed routes (flag set by the content script) - main column replaced by the sealed panel
- * Dialogs (compose, media) render outside <main> and stay usable
+ * Feed routes (flag set by the content script) - the timeline list is replaced by the sealed panel
+ * Tabs, compose box, and column widths stay as they are
  */
-html[data-nocturne-feed] main > * {
+html[data-nocturne-feed] [data-testid="primaryColumn"] section[role="region"] > * {
   display: none !important;
 }
 
-html[data-nocturne-feed] main::after {
+html[data-nocturne-feed] [data-testid="primaryColumn"] section[role="region"]::after {
   content: '' !important;
   display: block !important;
-  width: 100% !important;
-  min-height: 100dvh !important;
+  height: 70vh !important;
   background: var(--nocturne-mark) center / 96px auto no-repeat, var(--nocturne-gray) !important;
+}
+
+/* Newer X app (no data-testid): hide timeline entries on feed routes */
+html[data-nocturne-feed] main [data-timeline-entry] {
+  display: none !important;
 }

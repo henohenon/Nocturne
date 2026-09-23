@@ -20,3 +20,10 @@
 - `tsc --noEmit`, 12 unit tests (state + X routes, incl. compose inheriting the page state), `wxt build` pass; manifest has both content scripts and x.com / twitter.com host permissions
 - Live x.com (logged out, 1280×800), stylesheet injected: right aside hidden; with the flag set, `<main>` children hidden and the gray panel with the mark shown
 - Not verified: logged-in home / explore on the real extension (needs the user's session)
+
+## Revision (after inspecting the logged-in page)
+- The first version hid everything inside `<main>` and the whole sidebar — based on the logged-out page only. Logged-in users get the older app, where `<main>` wraps both columns, so the whole layout collapsed into one gray block
+- Now targeted: on feed routes only the timeline list (`section[role=region]` in `primaryColumn`) becomes the panel; tabs, compose box, and column widths stay. Sidebar: the outermost element with 4+ children is the module list; every module except the search box and footer is hidden, the column stays
+- Newer app: only timeline entries hidden on feed routes (logged-in view of the newer app not available to inspect)
+- Verified in the user's logged-in Chrome (stylesheet injected; route flag from the installed extension): /home and /explore sealed with widths unchanged (primary 600, sidebar 350), sidebar shows only search + footer, /notifications untouched, flag follows in-app navigation
+- A first load of /home froze the tab once (renderer unresponsive for 45 s+) while the extension was inactive (night); later loads were normal (DOMContentLoaded ~80–110 ms). Not reproduced, cause unknown

@@ -1,8 +1,8 @@
 # Spec: X Timeline Seal
 
 ## Sealed
-- Home (`/home`, both tabs) and Explore (`/explore…`): the main column is replaced by a gray sealed panel with the mark
-- Right sidebar (trends, who to follow, etc.): hidden on every page
+- Home (`/home`, all tabs) and Explore (`/explore…`): the timeline list is replaced by a gray sealed panel with the mark; tabs and compose box stay
+- Right sidebar: feed modules (trends, news, Spaces, who to follow, Premium) hidden on every page; search box and footer stay, column width unchanged
 
 ## Free
 - Everything else: notifications, messages, profiles, individual posts (anyone's), search, bookmarks, settings
