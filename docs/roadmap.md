@@ -80,6 +80,13 @@ Nocturne（旧 yt-overlay）の開発ロードマップ
 - [x] ブランチ・バージョン・リリース方針（`.claude/rules/git.md`）
 - [x] v1.1.0 リリース
 
+## X のタイムラインを封印 ✅
+- [x] 設計（business / spec / archi）
+- [x] 封印の付け外しを共通化（YouTube / X の content script）
+- [x] X: ページ判定（/home・/explore）と封印 CSS、右カラム非表示
+- [x] manifest・文言を X 対応に
+- [x] テスト・ビルド・確認
+
 ---
 
 **最終更新**: 2026-09-23

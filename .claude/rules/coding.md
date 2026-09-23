@@ -15,6 +15,7 @@ Conventions derived from the existing codebase. Follow these when reading or wri
 
 - **Selectors**: YouTube custom element names (`ytd-*`, `yt-*`, `ytm-*`) and their view-model classes; no generic HTML tags as targets
 - **Visibility pattern**: default = hidden/blocked; allowlist via `:not(:has(...))` in CSS, written once (nesting) — no JS-side judgment
+- **Exception — route level**: when the decision depends on the URL (CSS cannot see it), JS only sets a flag attribute on `<html>`; the stylesheet still does all hiding under that flag (see X)
 - **`!important`**: required throughout — content scripts must override YouTube's inline styles
 - **Grouping**: related selectors on separate lines; section header comment before each group
 
@@ -35,7 +36,7 @@ if (document.getElementById('nocturne-styles')) return;
 
 ## File Structure
 
-- One concern per file: `content.ts` (logic), `overlay.css` (styles)
-- Configuration constants at the top of `content.ts`
+- One concern per file: per-site content script (logic) + per-site stylesheet (styles); shared lifecycle in `overlay.ts`
+- Configuration constants in `config.ts` (site-specific ones at the top of that site's script)
 - WXT entrypoints: runtime code (`chrome.*`, DOM) only inside `main()` — the module is evaluated at build time
 - No splitting into multiple files unless the file becomes unmanageable

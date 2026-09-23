@@ -2,7 +2,7 @@
 
 # Nocturne
 
-Chrome extension that blocks distracting YouTube recommendations behind a deliberate checkpoint; free at night.
+Chrome extension that blocks distracting feeds (YouTube recommendations, X timeline) behind a deliberate checkpoint; free at night.
 
 ## Stack
 - TypeScript + WXT (Vite) + bun
@@ -10,12 +10,13 @@ Chrome extension that blocks distracting YouTube recommendations behind a delibe
 - CSS injection via content script
 
 ## Key Paths
-- `src/entrypoints/content.ts` — content script entry point
-- `src/entrypoints/popup/` — extension popup
-- `src/styles/overlay.css` — overlay CSS styles
+- `src/entrypoints/youtube.content.ts`, `x.content.ts` — per-site content scripts
+- `src/overlay.ts` — shared seal lifecycle (inject/remove styles, follow shared state)
+- `src/state.ts`, `src/config.ts` — shared state and constants
+- `src/entrypoints/popup/`, `disable/` — extension popup, disable window
+- `src/styles/youtube.css`, `x.css` — per-site seal styles
 - `wxt.config.ts` — build config + extension manifest (source)
 - `dist/chrome-mv3/` — production build; `dist/chrome-mv3-dev/` — dev build (`bun run dev`, auto-reloads)
-- `docs/` — all project documentation
 - `docs/` — all project documentation
 
 ## Conventions
