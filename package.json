@@ -9,6 +9,7 @@
     "build": "wxt build",
     "zip": "wxt zip",
     "type-check": "tsc --noEmit",
+    "test": "bun test",
     "postinstall": "wxt prepare"
   },
   "keywords": [],
@@ -17,6 +18,7 @@
   "description": "Nocturne - a checkpoint against distracting feeds (YouTube)",
   "type": "module",
   "devDependencies": {
+    "@types/bun": "^1.4.2",
     "@types/chrome": "^0.1.37",
     "typescript": "^5.9.3",
     "wxt": "0.21.4"
