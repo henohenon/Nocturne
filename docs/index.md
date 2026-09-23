@@ -33,3 +33,4 @@ Lifecycle: `wip/` → `archive/`
 | `workflow.md` | Workflow doc structure and lifecycle |
 | `docs.md` | Doc writing style |
 | `coding.md` | TypeScript/CSS coding conventions |
+| `git.md` | Branching, versioning, release |

@@ -32,9 +32,11 @@ bun run type-check
 
 Keep only one of the dev / production builds enabled at a time — they are separate extensions with separate state.
 
-## Releasing
+## Branching and releasing
 
-Bump `version` in `package.json`, commit, then push a matching tag:
+`main` is always releasable. Small changes go straight to `main`; larger work uses a short-lived `feat/*` or `fix/*` branch merged via PR. Versions follow SemVer (patch: fixes and selector updates, minor: features and UI, major: breaking changes). Full policy: [`.claude/rules/git.md`](.claude/rules/git.md).
+
+To release, bump `version` in `package.json`, commit, then push a matching tag:
 
 ```bash
 git tag v1.0.1 && git push origin v1.0.1
